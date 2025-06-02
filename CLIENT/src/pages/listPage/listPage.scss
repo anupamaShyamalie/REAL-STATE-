@@ -1,0 +1,28 @@
+.listPage {
+    display: flex;
+    height: 100%; // match with your layout height minus header or whatever is on top
+  
+    .listContainer {
+      flex: 3;
+      height: 100%; // inherits 100% from listPage
+  
+  
+      .wrapper {
+        flex: 1;
+        overflow-y: auto; // smoother than scroll (adds only when needed)
+        padding-right: 50px;
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+        height: 100%;
+        padding-bottom: 50px;
+       
+      }
+    }
+  
+    .mapContainer {
+      flex: 2;
+    background-color: #F5F7FB;
+      height: 100%;
+    }
+  }

@@ -1,0 +1,410 @@
+@import "../../responsive.scss";
+
+.registerPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 0;
+  
+  .container {
+    width: 1100px;
+    max-width: 95%;
+    margin: 0 auto;
+    
+    .wrapper {
+      display: flex;
+      background-color: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      
+      @include md {
+        flex-direction: column;
+      }
+      
+      .leftPanel {
+        flex: 1;
+        background-color: #2D336B;
+        color: white;
+        padding: 50px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        
+        @include md {
+          padding: 30px;
+        }
+        
+        .brandingContent {
+          h1 {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            
+            @include md {
+              font-size: 28px;
+            }
+          }
+          
+          p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.9;
+          }
+          
+          .benefitsGrid {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            
+            .benefit {
+              display: flex;
+              align-items: flex-start;
+              gap: 15px;
+              
+              .iconCircle {
+                min-width: 48px;
+                height: 48px;
+                background-color: rgba(255, 255, 255, 0.2);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                
+                i {
+                  font-size: 20px;
+                  /* Use pseudo-elements since we don't have actual icons */
+                  &::before {
+                    content: "★";
+                  }
+                  
+                  &.icon-profile::before {
+                    content: "👤";
+                  }
+                  
+                  &.icon-chat::before {
+                    content: "💬";
+                  }
+                  
+                  &.icon-content::before {
+                    content: "📝";
+                  }
+                }
+              }
+              
+              .benefitContent {
+                h3 {
+                  font-size: 18px;
+                  font-weight: 600;
+                  margin-bottom: 5px;
+                }
+                
+                p {
+                  font-size: 14px;
+                  margin-bottom: 0;
+                  opacity: 0.8;
+                  line-height: 1.5;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      .rightPanel {
+        flex: 1.2;
+        padding: 50px;
+        
+        @include md {
+          padding: 30px;
+        }
+        
+        .formContainer {
+          max-width: 400px;
+          margin: 0 auto;
+          
+          h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            
+            @include md {
+              font-size: 24px;
+            }
+          }
+          
+          .errorAlert {
+            background-color: #fdeaea;
+            border-left: 4px solid #e53e3e;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: red;
+            
+            span {
+              color: #e53e3e;
+              font-size: 14px;
+            }
+          }
+          
+          .formGroup {
+            margin-bottom: 20px;
+            
+            label {
+              display: block;
+              margin-bottom: 8px;
+              font-weight: 500;
+              color: #333;
+            }
+            
+            .inputWithIcon {
+              position: relative;
+              
+              i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #aaa;
+                /* Use pseudo-elements since we don't have actual icons */
+                &::before {
+                  content: "•";
+                }
+                
+                &.icon-user::before {
+                  content: "👤";
+                }
+                
+                &.icon-email::before {
+                  content: "✉";
+                }
+                
+                &.icon-lock::before {
+                  content: "🔒";
+                }
+              }
+              
+              input {
+                width: 100%;
+                padding: 14px 14px 14px 40px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-family: inherit;
+                font-size: 14px;
+                transition: all 0.2s ease;
+                
+                &:focus {
+                  outline: none;
+                  border-color: #2D336B;
+                  box-shadow: 0 0 0 3px rgba(45, 51, 107, 0.1);
+                }
+                
+                &.errorInput {
+                  border-color: #e53e3e;
+                  
+                  &:focus {
+                    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+                  }
+                }
+                
+                &::placeholder {
+                  color: #aaa;
+                }
+              }
+            }
+            
+            .errorText {
+              color: #e53e3e;
+              font-size: 12px;
+              margin-top: 6px;
+              display: block;
+            }
+          }
+          
+          .termsContainer {
+            margin-bottom: 25px;
+            
+            .checkbox {
+              display: flex;
+              align-items: flex-start;
+              position: relative;
+              padding-left: 30px;
+              cursor: pointer;
+              font-size: 14px;
+              color: #555;
+              user-select: none;
+              line-height: 1.5;
+              
+              input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+                
+                &:checked ~ .checkmark {
+                  background-color: #2D336B;
+                  border-color: #2D336B;
+                  
+                  &:after {
+                    display: block;
+                  }
+                }
+              }
+              
+              .checkmark {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 18px;
+                width: 18px;
+                background-color: white;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+                
+                &:after {
+                  content: "";
+                  position: absolute;
+                  display: none;
+                  left: 6px;
+                  top: 2px;
+                  width: 5px;
+                  height: 10px;
+                  border: solid white;
+                  border-width: 0 2px 2px 0;
+                  transform: rotate(45deg);
+                }
+              }
+              
+              &:hover input ~ .checkmark {
+                border-color: #ccc;
+              }
+              
+              .termsLink {
+                color: #2D336B;
+                font-weight: 500;
+                text-decoration: none;
+                
+                &:hover {
+                  text-decoration: underline;
+                }
+              }
+            }
+            
+            .errorText {
+              color: #e53e3e;
+              font-size: 12px;
+              margin-top: 6px;
+              display: block;
+            }
+          }
+          
+          .registerButton {
+            width: 100%;
+            padding: 14px;
+            background-color: #2D336B;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            margin-bottom: 25px;
+            
+            &:hover {
+              background-color: darken(#2D336B, 10%);
+            }
+            
+            &.loading {
+              opacity: 0.8;
+              cursor: not-allowed;
+            }
+          }
+          
+          .divider {
+            position: relative;
+            text-align: center;
+            margin: 25px 0;
+            
+            &:before {
+              content: "";
+              position: absolute;
+              top: 50%;
+              left: 0;
+              right: 0;
+              height: 1px;
+              background-color: #eee;
+              z-index: 0;
+            }
+            
+            span {
+              display: inline-block;
+              background-color: white;
+              padding: 0 15px;
+              position: relative;
+              color: #888;
+              font-size: 14px;
+            }
+          }
+          
+          .socialLogin {
+            margin-bottom: 25px;
+            
+            .googleBtn {
+              width: 100%;
+              padding: 14px;
+              background-color: white;
+              border: 1px solid #ddd;
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 10px;
+              font-family: inherit;
+              font-size: 16px;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              
+              i {
+                color: #DB4437;
+                /* Use pseudo-elements since we don't have actual icons */
+                &::before {
+                  content: "G";
+                }
+              }
+              
+              &:hover {
+                background-color: #f9f9f9;
+                border-color: #ccc;
+              }
+            }
+          }
+          
+          .loginLink {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            
+            a {
+              color: #2D336B;
+              font-weight: 600;
+              text-decoration: none;
+              
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

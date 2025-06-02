@@ -1,0 +1,96 @@
+@use "../../responsive.scss" as res;
+
+.homePage {
+    display: flex;
+    height: 100%;
+  
+    .textContainer {
+      flex: 3;
+
+
+      .wrapper{
+        padding-right: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content:center;
+        gap: 50px;
+        height: 100%;
+
+        @include res.md{
+          padding: 0;
+        }
+
+        @include res.sm{
+
+          justify-content: flex-start;
+        }
+
+        p{
+            font-size: x-small;
+            text-align: justify;
+        }
+
+        .boxes{
+          display: flex;
+          justify-content: space-between;
+
+          @include res.sm {
+            display: none;
+          }
+
+          h2{
+            font-size: 20px;
+          }
+
+          h3{
+            font-size: 16px;
+            font-weight: 300;
+          }
+        }
+      }
+    }
+  
+    .imgContainer {
+      flex: 2;
+      background-color:#F5F7FB;
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      @include res.md{
+        display: none;
+      }
+  
+      img {
+        width: 115%;
+        position: absolute;
+        right: 0;
+        animation: machineMotion 10s infinite;
+        transform-origin: center;
+
+        @include res.lg{
+          width: 105%;
+        }
+      }
+    }
+  }
+  
+  // Machine-style animation keyframes
+  @keyframes machineMotion {
+    0% {
+      transform: scale(1) rotate(0deg) translateX(0);
+    }
+    25% {
+      transform: scale(1.05) rotate(1deg) translateX(-5px);
+    }
+    50% {
+      transform: scale(0.95) rotate(-1deg) translateX(5px);
+    }
+    75% {
+      transform: scale(1.02) rotate(0.5deg) translateX(-3px);
+    }
+    100% {
+      transform: scale(1) rotate(0deg) translateX(0);
+    }
+  }
+  

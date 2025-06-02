@@ -1,0 +1,122 @@
+@import "../../responsive.scss";
+
+.profilePage {
+  display: flex;
+  height: 100%;
+
+  @include md {
+    flex-direction: column;
+    overflow: scroll;
+  }
+
+  .details {
+    flex: 3;
+    overflow-y: scroll;
+    padding-bottom: 50px;
+
+    @include md {
+      flex: none;
+      height: max-content;
+    }
+
+    .wrapper {
+      padding: 20px 50px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+
+      .title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        h1 {
+          font-weight: bold;
+          font-size: 20px;
+          color: #333;
+        }
+
+        button {
+          padding: 12px 24px;
+          background-color: #2D336B;
+          color: white;
+          font-family: inherit;
+          cursor: pointer;
+          border: none;
+          border-radius: 4px;
+          font-weight: 500;
+          transition: background-color 0.2s ease;
+          
+          &:hover {
+            background-color: darken(#2D336B, 10%);
+          }
+          
+          a {
+            color: white;
+            text-decoration: none;
+          }
+        }
+      }
+
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+        span {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          color: #555;
+          
+          b {
+            color: #333;
+            font-weight: 600;
+          }
+        }
+
+        button{
+          width: 100px;
+          padding: 12px 24px;
+          background-color: #2D336B;
+          color: white;
+          font-family: inherit;
+          cursor: pointer;
+          border: none;
+          border-radius: 4px;
+          font-weight: 500;
+          transition: background-color 0.2s ease;
+        }
+
+        img {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  }
+  
+  .chatContainer {
+    flex: 2;
+    background-color: #F5F7FB;
+    height: 100%;
+
+    @include md {
+      flex: none;
+      height: max-content;
+    }
+
+    .wrapper {
+      padding: 20px;
+      height: 100%;
+    }
+  }
+}

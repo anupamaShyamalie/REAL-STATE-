@@ -1,0 +1,187 @@
+@import "../../responsive.scss";
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  
+  .modalContent {
+    background-color: white;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    
+    @include md {
+      width: 90%;
+    }
+    
+    .modalHeader {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #2D336B;
+      }
+      
+      .closeButton {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+        
+        &:hover {
+          color: #2D336B;
+        }
+      }
+    }
+    
+    .updateForm {
+      padding: 20px;
+      
+      .formGroup {
+        margin-bottom: 20px;
+        
+        label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 500;
+          color: #333;
+        }
+        
+        input {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-family: inherit;
+          font-size: 14px;
+          
+          &:focus {
+            outline: none;
+            border-color: #2D336B;
+            box-shadow: 0 0 0 2px rgba(45, 51, 107, 0.1);
+          }
+          
+          &.errorInput {
+            border-color: #e53e3e;
+          }
+        }
+        
+        .errorText {
+          color: #e53e3e;
+          font-size: 12px;
+          margin-top: 4px;
+          display: block;
+        }
+      }
+      
+      .avatarUpload {
+        .avatarPreview {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          overflow: hidden;
+          position: relative;
+          margin: 0 auto;
+          border: 2px solid #eee;
+          
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+          
+          .uploadOverlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(45, 51, 107, 0.7);
+            padding: 8px 0;
+            text-align: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            
+            &:hover {
+              opacity: 1;
+            }
+            
+            input[type="file"] {
+              position: absolute;
+              width: 0.1px;
+              height: 0.1px;
+              opacity: 0;
+              overflow: hidden;
+              z-index: -1;
+            }
+            
+            label {
+              color: white;
+              font-size: 12px;
+              cursor: pointer;
+              margin: 0;
+              display: inline-block;
+            }
+          }
+          
+          &:hover .uploadOverlay {
+            opacity: 1;
+          }
+        }
+      }
+      
+      .formActions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 30px;
+        
+        button {
+          padding: 12px 24px;
+          border-radius: 4px;
+          font-family: inherit;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          
+          &.cancelButton {
+            background-color: #f1f1f1;
+            color: #333;
+            border: none;
+            
+            &:hover {
+              background-color: #e1e1e1;
+            }
+          }
+          
+          &.saveButton {
+            background-color: #2D336B;
+            color: white;
+            border: none;
+            
+            &:hover {
+              background-color: darken(#2D336B, 10%);
+            }
+          }
+        }
+      }
+    }
+  }
+}
