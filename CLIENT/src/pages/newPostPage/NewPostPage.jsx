@@ -201,6 +201,7 @@ function NewPostPage() {
                         <div className="item description">
                             <label htmlFor="desc">Description</label>
                             <textarea id="desc" name="desc" className="descriptionTextArea" />
+                            <
                         </div>
 
                         <div className="item">
