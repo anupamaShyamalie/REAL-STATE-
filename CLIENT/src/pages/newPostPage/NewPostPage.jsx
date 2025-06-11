@@ -1,38 +1,112 @@
 import { useState, useRef, useEffect } from "react";
 import "./newPost.scss";
 import { useNavigate } from "react-router";
+import apiRequest from "../../lib/apiRequest";
+import CloudinaryUploadWidget from "../../component/upload/CloudinaryUploadWidget";
+
 
 function NewPostPage() {
     const [files, setFiles] = useState([]);
-    const [isDragging, setIsDragging] = useState(false);
-    const fileInputRef = useRef(null);
     const [messages, setMessages] = useState([
         { id: 1, text: "Hello! I'm your AI real estate assistant. How can I help you today?", sender: "ai", timestamp: "10:30 AM" },
         { id: 2, text: "I need help filling out this property listing form.", sender: "user", timestamp: "10:31 AM" },
         { id: 3, text: "Of course! I can guide you through each section. What information about your property would you like help with first?", sender: "ai", timestamp: "10:31 AM" },
     ]);
     const [newMessage, setNewMessage] = useState("");
+    const [uploadedImages, setUploadedImages] = useState([]);
     const messagesEndRef = useRef(null);
     const navigate = useNavigate();
+    const [error, setError] = useState("");
 
-    const submit = ()=>{
-        navigate("/list")
-    }
-    
+    // Cloudinary configuration
+    const uwConfig = {
+        cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "dblwkkext",
+        uploadPreset: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "estate",
+        multiple: true,
+        maxFiles: 10,
+        resourceType: "image",
+        clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
+        maxFileSize: 15000000, // 15MB
+        folder: "real-estate-posts"
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        
+        const formData = new FormData(e.target);
+        const inputs = Object.fromEntries(formData);
+        
+        // Validate required fields
+        if (!inputs.title || !inputs.price || !inputs.address) {
+            setError("Please fill in all required fields (Title, Price, Address)");
+            return;
+        }
+
+        try {
+            const postData = {
+                title: inputs.title,
+                price: parseInt(inputs.price),
+                images: uploadedImages, // Array of Cloudinary URLs
+                address: inputs.address,
+                city: inputs.city,
+                bedroom: parseInt(inputs.bedroom) || 1,
+                bathroom: parseInt(inputs.bathroom) || 1,
+                latitude: inputs.latitude,
+                longitude: inputs.longitude,
+                type: inputs.type, // "buy" or "rent"
+                property: inputs.property // "apartment", "house", "condo", "land"
+            };
+
+            const postDetails = {
+                desc: inputs.desc || "",
+                utilities: inputs.utilities,
+                pet: inputs.pet,
+                income: inputs.income,
+                size: parseInt(inputs.size) || null,
+                school: parseInt(inputs.school) || null,
+                bus: parseInt(inputs.bus) || null,
+                restaurant: parseInt(inputs.restaurant) || null
+            };
+
+            const res = await apiRequest.post('/posts', {
+                postData,
+                postDetails
+            });
+
+            console.log("Post created successfully:", res.data);
+            navigate("/list");
+            
+        } catch (err) {
+            console.log(err);
+            setError(err.response?.data?.message || "Failed to create post. Please try again.");
+        }
+    };
+
+    // Handle multiple image uploads from Cloudinary
+    const handleImageUpload = (imageUrl) => {
+        setUploadedImages(prev => [...prev, imageUrl]);
+    };
+
+    // Remove uploaded image
+    const removeUploadedImage = (imageUrl) => {
+        setUploadedImages(prev => prev.filter(url => url !== imageUrl));
+    };
+
     // Auto-scroll to the bottom of messages
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    const handleFileChange = (e) => {
-        const selectedFiles = Array.from(e.target.files);
-        addNewFiles(selectedFiles);
-    };
+    // const handleFileChange = (e) => {
+    //     const selectedFiles = Array.from(e.target.files);
+    //     addNewFiles(selectedFiles);
+    // };
 
-    const addNewFiles = (newFiles) => {
+    (newFiles) => {
         // Filter for only image files
-        const validImageFiles = newFiles.filter(file => 
-            file.type.startsWith('image/') && 
+        const validImageFiles = newFiles.filter(file =>
+            file.type.startsWith('image/') &&
             ['jpeg', 'jpg', 'png', 'gif'].includes(file.type.split('/')[1].toLowerCase())
         );
 
@@ -46,52 +120,52 @@ function NewPostPage() {
         setFiles(prevFiles => [...prevFiles, ...newFilesWithPreview]);
     };
 
-    const handleDragEnter = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDragging(true);
-    };
+    // const handleDragEnter = (e) => {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //     setIsDragging(true);
+    // };
 
-    const handleDragLeave = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDragging(false);
-    };
+    // const handleDragLeave = (e) => {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //     setIsDragging(false);
+    // };
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!isDragging) setIsDragging(true);
-    };
+    // const handleDragOver = (e) => {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //     if (!isDragging) setIsDragging(true);
+    // };
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDragging(false);
-        
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            addNewFiles(Array.from(e.dataTransfer.files));
-        }
-    };
+    // const handleDrop = (e) => {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //     setIsDragging(false);
 
-    const removeFile = (id) => {
-        setFiles(prevFiles => {
-            const newFiles = prevFiles.filter(file => file.id !== id);
-            // Free up memory from the URL
-            const fileToRemove = prevFiles.find(file => file.id === id);
-            if (fileToRemove) URL.revokeObjectURL(fileToRemove.preview);
-            return newFiles;
-        });
-    };
+    //     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    //         addNewFiles(Array.from(e.dataTransfer.files));
+    //     }
+    // };
 
-    const triggerFileInput = () => {
-        fileInputRef.current.click();
-    };
+    // const removeFile = (id) => {
+    //     setFiles(prevFiles => {
+    //         const newFiles = prevFiles.filter(file => file.id !== id);
+    //         // Free up memory from the URL
+    //         const fileToRemove = prevFiles.find(file => file.id === id);
+    //         if (fileToRemove) URL.revokeObjectURL(fileToRemove.preview);
+    //         return newFiles;
+    //     });
+    // };
+
+    // const triggerFileInput = () => {
+    //     fileInputRef.current.click();
+    // };
 
     const handleSendMessage = (e) => {
         e.preventDefault();
         if (newMessage.trim() === "") return;
-        
+
         // Add user message
         const userMessage = {
             id: messages.length + 1,
@@ -99,10 +173,10 @@ function NewPostPage() {
             sender: "user",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
-        
+
         setMessages([...messages, userMessage]);
         setNewMessage("");
-        
+
         // Simulate AI response after a short delay
         setTimeout(() => {
             const aiResponses = [
@@ -112,16 +186,16 @@ function NewPostPage() {
                 "The average price for similar properties in this area is about $1,200 per month for rentals.",
                 "Based on your property details, you might want to highlight the proximity to schools and public transport."
             ];
-            
+
             const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-            
+
             const aiMessage = {
                 id: messages.length + 2,
                 text: randomResponse,
                 sender: "ai",
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
-            
+
             setMessages(prevMessages => [...prevMessages, aiMessage]);
         }, 1000);
     };
@@ -130,78 +204,56 @@ function NewPostPage() {
         <div className="newPostPage">
             <div className="formContainer">
                 <h1>Add New Post</h1>
-                
-                {/* Enhanced File Uploader */}
-                <div 
-                    className={`fileUploader ${isDragging ? 'dragging' : ''}`}
-                    onDragEnter={handleDragEnter}
-                    onDragLeave={handleDragLeave}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                >
-                    <div className="fileUploaderContent">
-                        <div className="uploadIcon">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
-                        </div>
-                        <h3>Drag & Drop</h3>
-                        <p>Your files here or <span className="browseLink" onClick={triggerFileInput}>Browse</span> to upload</p>
-                        <p className="fileTypes">Only JPEG, PNG, GIF and PDF files with max size of 15 MB.</p>
-                        <input 
-                            ref={fileInputRef}
-                            id="file" 
-                            name="file" 
-                            type="file" 
-                            accept="image/*" 
-                            multiple 
-                            onChange={handleFileChange}
-                            className="hiddenInput"
-                        />
-                    </div>
+
+                {/* Cloudinary Image Upload Section */}
+                <div className="imageUploadSection">
+                    <h3>Property Images</h3>
+                    <CloudinaryUploadWidget 
+                        uwConfig={uwConfig} 
+                        setavatar={handleImageUpload}
+                    />
                     
-                    {/* Image Preview Section */}
-                    {files.length > 0 && (
-                        <div className="previewContainer">
-                            {files.map((file) => (
-                                <div key={file.id} className="previewItem">
-                                    <img src={file.preview} alt={file.file.name} />
-                                    <div className="previewOverlay">
-                                        <span className="fileName">{file.file.name}</span>
-                                        <button 
-                                            type="button" 
-                                            className="removeBtn"
-                                            onClick={() => removeFile(file.id)}
+                    {/* Display uploaded images */}
+                    {uploadedImages.length > 0 && (
+                        <div className="uploadedImagesContainer">
+                            <h4>Uploaded Images ({uploadedImages.length})</h4>
+                            <div className="uploadedImagesGrid">
+                                {uploadedImages.map((imageUrl, index) => (
+                                    <div key={index} className="uploadedImageItem">
+                                        <img src={imageUrl} alt={`Property ${index + 1}`} />
+                                        <button
+                                            type="button"
+                                            className="removeImageBtn"
+                                            onClick={() => removeUploadedImage(imageUrl)}
                                         >
                                             ×
                                         </button>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>
 
+              
+
                 <div className="wrapper">
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <div className="item">
-                            <label htmlFor="title">Title</label>
-                            <input id="title" name="title" type="text" />
+                            <label htmlFor="title">Title *</label>
+                            <input id="title" name="title" type="text" required />
                         </div>
                         <div className="item">
-                            <label htmlFor="price">Price</label>
-                            <input id="price" name="price" type="number" />
+                            <label htmlFor="price">Price *</label>
+                            <input id="price" name="price" type="number" required />
                         </div>
                         <div className="item">
-                            <label htmlFor="address">Address</label>
-                            <input id="address" name="address" type="text" />
+                            <label htmlFor="address">Address *</label>
+                            <input id="address" name="address" type="text" required />
                         </div>
                         <div className="item description">
                             <label htmlFor="desc">Description</label>
                             <textarea id="desc" name="desc" className="descriptionTextArea" />
-                            <
                         </div>
 
                         <div className="item">
@@ -210,11 +262,11 @@ function NewPostPage() {
                         </div>
                         <div className="item">
                             <label htmlFor="bedroom">Bedroom Number</label>
-                            <input min={1} id="bedroom" name="bedroom" type="number" />
+                            <input min={1} id="bedroom" name="bedroom" type="number" defaultValue="1" />
                         </div>
                         <div className="item">
                             <label htmlFor="bathroom">Bathroom Number</label>
-                            <input min={1} id="bathroom" name="bathroom" type="number" />
+                            <input min={1} id="bathroom" name="bathroom" type="number" defaultValue="1" />
                         </div>
                         <div className="item">
                             <label htmlFor="latitude">Latitude</label>
@@ -226,16 +278,14 @@ function NewPostPage() {
                         </div>
                         <div className="item">
                             <label htmlFor="type">Type</label>
-                            <select name="type">
-                                <option value="rent" defaultChecked>
-                                    Rent
-                                </option>
+                            <select name="type" defaultValue="rent">
+                                <option value="rent">Rent</option>
                                 <option value="buy">Buy</option>
                             </select>
                         </div>
                         <div className="item">
-                            <label htmlFor="type">Property</label>
-                            <select name="property">
+                            <label htmlFor="property">Property</label>
+                            <select name="property" defaultValue="apartment">
                                 <option value="apartment">Apartment</option>
                                 <option value="house">House</option>
                                 <option value="condo">Condo</option>
@@ -244,7 +294,7 @@ function NewPostPage() {
                         </div>
                         <div className="item">
                             <label htmlFor="utilities">Utilities Policy</label>
-                            <select name="utilities">
+                            <select name="utilities" defaultValue="owner">
                                 <option value="owner">Owner is responsible</option>
                                 <option value="tenant">Tenant is responsible</option>
                                 <option value="shared">Shared</option>
@@ -252,7 +302,7 @@ function NewPostPage() {
                         </div>
                         <div className="item">
                             <label htmlFor="pet">Pet Policy</label>
-                            <select name="pet">
+                            <select name="pet" defaultValue="allowed">
                                 <option value="allowed">Allowed</option>
                                 <option value="not-allowed">Not Allowed</option>
                             </select>
@@ -271,18 +321,21 @@ function NewPostPage() {
                             <input min={0} id="size" name="size" type="number" />
                         </div>
                         <div className="item">
-                            <label htmlFor="school">School</label>
+                            <label htmlFor="school">School Distance</label>
                             <input min={0} id="school" name="school" type="number" />
                         </div>
                         <div className="item">
-                            <label htmlFor="bus">bus</label>
+                            <label htmlFor="bus">Bus Stop Distance</label>
                             <input min={0} id="bus" name="bus" type="number" />
                         </div>
                         <div className="item">
-                            <label htmlFor="restaurant">Restaurant</label>
+                            <label htmlFor="restaurant">Restaurant Distance</label>
                             <input min={0} id="restaurant" name="restaurant" type="number" />
                         </div>
-                        <button className="sendButton" onClick={()=>submit}>Add</button>
+                        <button className="sendButton" type="submit">
+                            Add Property
+                        </button>
+                        {error && <span style={{color:"red", fontSize:"14px", marginTop:"10px", display:"block"}}>{error}</span>}
                     </form>
                 </div>
             </div>
@@ -312,11 +365,11 @@ function NewPostPage() {
                             </button>
                         </div>
                     </div>
-                    
+
                     <div className="messageContainer">
                         {messages.map((message) => (
-                            <div 
-                                key={message.id} 
+                            <div
+                                key={message.id}
                                 className={`message ${message.sender === 'user' ? 'userMessage' : 'aiMessage'}`}
                             >
                                 <div className="messageContent">
@@ -327,7 +380,7 @@ function NewPostPage() {
                         ))}
                         <div ref={messagesEndRef} />
                     </div>
-                    
+
                     <form className="messageInput" onSubmit={handleSendMessage}>
                         <input
                             type="text"
@@ -342,7 +395,7 @@ function NewPostPage() {
                             </svg>
                         </button>
                     </form>
-                    
+
                     <div className="suggestionChips">
                         <button onClick={() => setNewMessage("What's a good price for my property?")}>
                             Suggest pricing
