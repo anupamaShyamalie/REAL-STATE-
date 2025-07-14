@@ -1,19 +1,26 @@
+// 4. Updated NewPostPage component with Gemini integration
 import { useState, useRef, useEffect } from "react";
 import "./newPost.scss";
 import { useNavigate } from "react-router";
 import apiRequest from "../../lib/apiRequest";
 import CloudinaryUploadWidget from "../../component/upload/CloudinaryUploadWidget";
-
+import { GeminiChatService } from "../../lib/geminiService";
 
 function NewPostPage() {
     const [files, setFiles] = useState([]);
     const [messages, setMessages] = useState([
-        { id: 1, text: "Hello! I'm your AI real estate assistant. How can I help you today?", sender: "ai", timestamp: "10:30 AM" },
-        { id: 2, text: "I need help filling out this property listing form.", sender: "user", timestamp: "10:31 AM" },
-        { id: 3, text: "Of course! I can guide you through each section. What information about your property would you like help with first?", sender: "ai", timestamp: "10:31 AM" },
+        { 
+            id: 1, 
+            text: "Hello! I'm your AI real estate assistant powered by Google Gemini. I can help you create an amazing property listing. What would you like to know?", 
+            sender: "ai", 
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
     ]);
     const [newMessage, setNewMessage] = useState("");
     const [uploadedImages, setUploadedImages] = useState([]);
+    const [isAiThinking, setIsAiThinking] = useState(false);
+    const [geminiService] = useState(() => new GeminiChatService());
+    const [currentPropertyData, setCurrentPropertyData] = useState({});
     const messagesEndRef = useRef(null);
     const navigate = useNavigate();
     const [error, setError] = useState("");
@@ -26,8 +33,17 @@ function NewPostPage() {
         maxFiles: 10,
         resourceType: "image",
         clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
-        maxFileSize: 15000000, // 15MB
+        maxFileSize: 15000000,
         folder: "real-estate-posts"
+    };
+
+    // Track form changes for context
+    const handleFormChange = (e) => {
+        const { name, value } = e.target;
+        setCurrentPropertyData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -37,7 +53,6 @@ function NewPostPage() {
         const formData = new FormData(e.target);
         const inputs = Object.fromEntries(formData);
         
-        // Validate required fields
         if (!inputs.title || !inputs.price || !inputs.address) {
             setError("Please fill in all required fields (Title, Price, Address)");
             return;
@@ -47,15 +62,15 @@ function NewPostPage() {
             const postData = {
                 title: inputs.title,
                 price: parseInt(inputs.price),
-                images: uploadedImages, // Array of Cloudinary URLs
+                images: uploadedImages,
                 address: inputs.address,
                 city: inputs.city,
                 bedroom: parseInt(inputs.bedroom) || 1,
                 bathroom: parseInt(inputs.bathroom) || 1,
                 latitude: inputs.latitude,
                 longitude: inputs.longitude,
-                type: inputs.type, // "buy" or "rent"
-                property: inputs.property // "apartment", "house", "condo", "land"
+                type: inputs.type,
+                property: inputs.property
             };
 
             const postDetails = {
@@ -83,129 +98,67 @@ function NewPostPage() {
         }
     };
 
-    // Handle multiple image uploads from Cloudinary
     const handleImageUpload = (imageUrl) => {
         setUploadedImages(prev => [...prev, imageUrl]);
     };
 
-    // Remove uploaded image
     const removeUploadedImage = (imageUrl) => {
         setUploadedImages(prev => prev.filter(url => url !== imageUrl));
     };
 
-    // Auto-scroll to the bottom of messages
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    // const handleFileChange = (e) => {
-    //     const selectedFiles = Array.from(e.target.files);
-    //     addNewFiles(selectedFiles);
-    // };
-
-    (newFiles) => {
-        // Filter for only image files
-        const validImageFiles = newFiles.filter(file =>
-            file.type.startsWith('image/') &&
-            ['jpeg', 'jpg', 'png', 'gif'].includes(file.type.split('/')[1].toLowerCase())
-        );
-
-        // Create preview URLs for the valid files
-        const newFilesWithPreview = validImageFiles.map(file => ({
-            file,
-            id: Math.random().toString(36).substring(2),
-            preview: URL.createObjectURL(file)
-        }));
-
-        setFiles(prevFiles => [...prevFiles, ...newFilesWithPreview]);
-    };
-
-    // const handleDragEnter = (e) => {
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //     setIsDragging(true);
-    // };
-
-    // const handleDragLeave = (e) => {
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //     setIsDragging(false);
-    // };
-
-    // const handleDragOver = (e) => {
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //     if (!isDragging) setIsDragging(true);
-    // };
-
-    // const handleDrop = (e) => {
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //     setIsDragging(false);
-
-    //     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-    //         addNewFiles(Array.from(e.dataTransfer.files));
-    //     }
-    // };
-
-    // const removeFile = (id) => {
-    //     setFiles(prevFiles => {
-    //         const newFiles = prevFiles.filter(file => file.id !== id);
-    //         // Free up memory from the URL
-    //         const fileToRemove = prevFiles.find(file => file.id === id);
-    //         if (fileToRemove) URL.revokeObjectURL(fileToRemove.preview);
-    //         return newFiles;
-    //     });
-    // };
-
-    // const triggerFileInput = () => {
-    //     fileInputRef.current.click();
-    // };
-
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (newMessage.trim() === "") return;
+        if (newMessage.trim() === "" || isAiThinking) return;
 
-        // Add user message
         const userMessage = {
-            id: messages.length + 1,
+            id: Date.now(),
             text: newMessage,
             sender: "user",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
 
-        setMessages([...messages, userMessage]);
+        setMessages(prev => [...prev, userMessage]);
         setNewMessage("");
+        setIsAiThinking(true);
 
-        // Simulate AI response after a short delay
-        setTimeout(() => {
-            const aiResponses = [
-                "I recommend adding detailed descriptions about the neighborhood amenities to attract more potential buyers.",
-                "For rental properties, it's good to mention utilities policy clearly in the description.",
-                "Don't forget to add high-quality images of all rooms to showcase your property well.",
-                "The average price for similar properties in this area is about $1,200 per month for rentals.",
-                "Based on your property details, you might want to highlight the proximity to schools and public transport."
-            ];
-
-            const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-
+        try {
+            // Send message to Gemini with property context
+            const aiResponse = await geminiService.sendMessage(newMessage, currentPropertyData);
+            
             const aiMessage = {
-                id: messages.length + 2,
-                text: randomResponse,
+                id: Date.now() + 1,
+                text: aiResponse,
                 sender: "ai",
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
-            setMessages(prevMessages => [...prevMessages, aiMessage]);
-        }, 1000);
+            setMessages(prev => [...prev, aiMessage]);
+        } catch (error) {
+            console.error('AI Response Error:', error);
+            const errorMessage = {
+                id: Date.now() + 1,
+                text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+                sender: "ai",
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsAiThinking(false);
+        }
     };
+
+    // Generate smart suggestions based on current form data
+    const smartSuggestions = geminiService.getSmartSuggestions(currentPropertyData);
 
     return (
         <div className="newPostPage">
             <div className="formContainer">
                 <h1>Add New Post</h1>
 
-                {/* Cloudinary Image Upload Section */}
                 <div className="imageUploadSection">
                     <h3>Property Images</h3>
                     <CloudinaryUploadWidget 
@@ -213,7 +166,6 @@ function NewPostPage() {
                         setavatar={handleImageUpload}
                     />
                     
-                    {/* Display uploaded images */}
                     {uploadedImages.length > 0 && (
                         <div className="uploadedImagesContainer">
                             <h4>Uploaded Images ({uploadedImages.length})</h4>
@@ -235,57 +187,115 @@ function NewPostPage() {
                     )}
                 </div>
 
-              
-
                 <div className="wrapper">
                     <form onSubmit={handleSubmit}>
                         <div className="item">
                             <label htmlFor="title">Title *</label>
-                            <input id="title" name="title" type="text" required />
+                            <input 
+                                id="title" 
+                                name="title" 
+                                type="text" 
+                                required 
+                                onChange={handleFormChange}
+                            />
                         </div>
                         <div className="item">
                             <label htmlFor="price">Price *</label>
-                            <input id="price" name="price" type="number" required />
+                            <input 
+                                id="price" 
+                                name="price" 
+                                type="number" 
+                                required 
+                                onChange={handleFormChange}
+                            />
                         </div>
                         <div className="item">
                             <label htmlFor="address">Address *</label>
-                            <input id="address" name="address" type="text" required />
+                            <input 
+                                id="address" 
+                                name="address" 
+                                type="text" 
+                                required 
+                                onChange={handleFormChange}
+                            />
                         </div>
                         <div className="item description">
                             <label htmlFor="desc">Description</label>
-                            <textarea id="desc" name="desc" className="descriptionTextArea" />
+                            <textarea 
+                                id="desc" 
+                                name="desc" 
+                                className="descriptionTextArea" 
+                                onChange={handleFormChange}
+                            />
                         </div>
 
                         <div className="item">
                             <label htmlFor="city">City</label>
-                            <input id="city" name="city" type="text" />
+                            <input 
+                                id="city" 
+                                name="city" 
+                                type="text" 
+                                onChange={handleFormChange}
+                            />
                         </div>
                         <div className="item">
                             <label htmlFor="bedroom">Bedroom Number</label>
-                            <input min={1} id="bedroom" name="bedroom" type="number" defaultValue="1" />
+                            <input 
+                                min={1} 
+                                id="bedroom" 
+                                name="bedroom" 
+                                type="number" 
+                                defaultValue="1" 
+                                onChange={handleFormChange}
+                            />
                         </div>
                         <div className="item">
                             <label htmlFor="bathroom">Bathroom Number</label>
-                            <input min={1} id="bathroom" name="bathroom" type="number" defaultValue="1" />
+                            <input 
+                                min={1} 
+                                id="bathroom" 
+                                name="bathroom" 
+                                type="number" 
+                                defaultValue="1" 
+                                onChange={handleFormChange}
+                            />
                         </div>
                         <div className="item">
                             <label htmlFor="latitude">Latitude</label>
-                            <input id="latitude" name="latitude" type="text" />
+                            <input 
+                                id="latitude" 
+                                name="latitude" 
+                                type="text" 
+                                onChange={handleFormChange}
+                            />
                         </div>
                         <div className="item">
                             <label htmlFor="longitude">Longitude</label>
-                            <input id="longitude" name="longitude" type="text" />
+                            <input 
+                                id="longitude" 
+                                name="longitude" 
+                                type="text" 
+                                onChange={handleFormChange}
+                            />
                         </div>
                         <div className="item">
                             <label htmlFor="type">Type</label>
-                            <select name="type" defaultValue="rent">
+                            <select 
+                                name="type" 
+                                defaultValue="rent" 
+                                onChange={handleFormChange}
+                            >
                                 <option value="rent">Rent</option>
                                 <option value="buy">Buy</option>
                             </select>
                         </div>
                         <div className="item">
                             <label htmlFor="property">Property</label>
-                            <select name="property" defaultValue="apartment">
+                            <select 
+                                name="property" 
+                                defaultValue="apartment" 
+                                onChange={handleFormChange}
+                            >
                                 <option value="apartment">Apartment</option>
                                 <option value="house">House</option>
                                 <option value="condo">Condo</option>
@@ -318,7 +328,13 @@ function NewPostPage() {
                         </div>
                         <div className="item">
                             <label htmlFor="size">Total Size (sqft)</label>
-                            <input min={0} id="size" name="size" type="number" />
+                            <input 
+                                min={0} 
+                                id="size" 
+                                name="size" 
+                                type="number" 
+                                onChange={handleFormChange}
+                            />
                         </div>
                         <div className="item">
                             <label htmlFor="school">School Distance</label>
@@ -339,28 +355,34 @@ function NewPostPage() {
                     </form>
                 </div>
             </div>
+            
             <div className="sideContainer">
                 <div className="chatbot">
                     <div className="chatHeader">
                         <div className="chatInfo">
                             <div className="aiAvatar">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-1 20v-6h2v6h-2zm1-10c-3.3 0-6-2.7-6-6h2c0 2.2 1.8 4 4 4s4-1.8 4-4h2c0 3.3-2.7 6-6 6z" />
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                 </svg>
                             </div>
-                            <h3>Real Estate Assistant</h3>
+                            <h3>Gemini AI Assistant</h3>
                         </div>
                         <div className="chatActions">
-                            <button className="actionButton">
+                            <button 
+                                className="actionButton"
+                                onClick={() => {
+                                    setMessages([{
+                                        id: 1,
+                                        text: "Hello! I'm your AI real estate assistant powered by Google Gemini. I can help you create an amazing property listing. What would you like to know?",
+                                        sender: "ai",
+                                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                    }]);
+                                    geminiService.clearHistory();
+                                }}
+                                title="Clear Chat"
+                            >
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                                </svg>
-                            </button>
-                            <button className="actionButton">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                    <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
                                 </svg>
                             </button>
                         </div>
@@ -378,6 +400,20 @@ function NewPostPage() {
                                 </div>
                             </div>
                         ))}
+                        
+                        {isAiThinking && (
+                            <div className="message aiMessage">
+                                <div className="messageContent">
+                                    <div className="thinking-indicator">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                    <span className="timestamp">Thinking...</span>
+                                </div>
+                            </div>
+                        )}
+                        
                         <div ref={messagesEndRef} />
                     </div>
 
@@ -387,8 +423,9 @@ function NewPostPage() {
                             placeholder="Ask about your property listing..."
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
+                            disabled={isAiThinking}
                         />
-                        <button type="submit">
+                        <button type="submit" disabled={isAiThinking}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <line x1="22" y1="2" x2="11" y2="13"></line>
                                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -397,15 +434,15 @@ function NewPostPage() {
                     </form>
 
                     <div className="suggestionChips">
-                        <button onClick={() => setNewMessage("What's a good price for my property?")}>
-                            Suggest pricing
-                        </button>
-                        <button onClick={() => setNewMessage("Help me write a description")}>
-                            Write description
-                        </button>
-                        <button onClick={() => setNewMessage("What amenities should I highlight?")}>
-                            Key amenities
-                        </button>
+                        {smartSuggestions.map((suggestion, index) => (
+                            <button 
+                                key={index}
+                                onClick={() => setNewMessage(suggestion)}
+                                disabled={isAiThinking}
+                            >
+                                {suggestion}
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>

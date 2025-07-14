@@ -1,4 +1,3 @@
-
 import {
   createBrowserRouter,
   RouterProvider,
@@ -12,6 +11,8 @@ import NewPostPage from "./pages/newPostPage/NewPostPage";
 import Login from "./pages/loginPage/Login";
 import Register from "./pages/registerPage/Register";
 import ProfileUpdate from "./pages/profileUpdatePage/ProfileUpdate";
+import { AuthContextProvider } from "./context/AuthContext";
+import { SocketProvider } from "./context/SocketContext";
 
 function App() {
 
@@ -32,8 +33,6 @@ function App() {
           path: "/:id",
           element: <SinglePage />
         },
-
-       
         {
           path: "/login",
           element: <Login />
@@ -42,7 +41,6 @@ function App() {
           path: "/register",
           element: <Register />
         },
-
       ]
     },
     {
@@ -63,13 +61,14 @@ function App() {
         },
       ]
     }
-
   ]);
 
   return (
-    <>
-      <RouterProvider router={router} />
-    </>
+    <AuthContextProvider>
+      <SocketProvider>
+        <RouterProvider router={router} />
+      </SocketProvider>
+    </AuthContextProvider>
   )
 }
 
