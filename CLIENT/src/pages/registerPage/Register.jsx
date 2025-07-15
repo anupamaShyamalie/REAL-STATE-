@@ -6,11 +6,13 @@ import apiRequest from "../../lib/apiRequest";
 function Register() {
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("")
+    setError("");
+    setLoading(true);
 
     const formData = new FormData(e.target);
 
@@ -19,18 +21,28 @@ function Register() {
     const password = formData.get("password");
 
     try {
-      await apiRequest.post("/api/auth/register", {
+      debugger
+      // Fixed: Remove /api from the path since baseURL already includes it
+      await apiRequest.post("/auth/register", {
         username,
         email,
         password
-      })
+      });
       navigate("/login");
     } catch (err) {
-      console.log(err)
-      setError(err.response.data.message)
+      console.log(err);
+      // Improved error handling
+      if (err.response && err.response.data) {
+        setError(err.response.data.message || "Registration failed");
+      } else if (err.request) {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
-
-  }
+  };
 
   return (
     <div className="registerPage">
@@ -86,6 +98,7 @@ function Register() {
                       id="username"
                       name="username"
                       placeholder="Choose a username"
+                      required
                     />
                   </div>
                 </div>
@@ -99,6 +112,7 @@ function Register() {
                       id="email"
                       name="email"
                       placeholder="Enter your email"
+                      required
                     />
                   </div>
                 </div>
@@ -112,22 +126,23 @@ function Register() {
                       id="password"
                       name="password"
                       placeholder="Create a password"
+                      required
                     />
                   </div>
                 </div>
 
                 <div className="termsContainer">
                   <label className="checkbox">
-                    <input type="checkbox" />
+                    <input type="checkbox" required />
                     <span className="checkmark"></span>
                     I agree to the <Link to="/terms" className="termsLink">Terms & Conditions</Link> and <Link to="/privacy" className="termsLink">Privacy Policy</Link>
                   </label>
                 </div>
 
-                <button type="submit" className="registerButton">
-                  Create Account
+                <button type="submit" className="registerButton" disabled={loading}>
+                  {loading ? "Creating Account..." : "Create Account"}
                 </button>
-               {error && <div className="errorAlert">{error}</div> }
+                {error && <div className="errorAlert">{error}</div>}
               </form>
 
               <div className="divider">
