@@ -13,6 +13,7 @@ import Register from "./pages/registerPage/Register";
 import ProfileUpdate from "./pages/profileUpdatePage/ProfileUpdate";
 import { AuthContextProvider } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
+import { singlePageLoader } from "./lib/loader";
 
 function App() {
 
@@ -31,7 +32,8 @@ function App() {
         },
         {
           path: "/:id",
-          element: <SinglePage />
+          element: <SinglePage />,
+          loader:singlePageLoader
         },
         {
           path: "/login",

@@ -17,20 +17,19 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
     if (currentUser) {
       // Create socket connection
-      const newSocket = io('http://localhost:8800', {
-        auth: {
-          token: localStorage.getItem('token') // Or however you store your JWT
-        }
+      const newSocket = io('http://localhost:5000', {
+        withCredentials: true // This will send cookies with the request
       });
 
       // Connection event handlers
       newSocket.on('connect', () => {
-        console.log('Connected to server');
+        console.log('Connected to server with socket ID:', newSocket.id);
         setSocket(newSocket);
       });
 
@@ -40,16 +39,31 @@ export const SocketProvider = ({ children }) => {
 
       // Listen for online users
       newSocket.on('getOnlineUsers', (users) => {
+        console.log('Received online users:', users);
         setOnlineUsers(users);
       });
 
       // Listen for new message notifications
       newSocket.on('newMessageNotification', (notification) => {
-        setNotifications(prev => [...prev, {
-          id: Date.now(),
-          ...notification,
-          timestamp: new Date()
-        }]);
+        console.log('Received notification:', notification);
+        console.log('Current user ID:', currentUser.id);
+        console.log('Notification from user ID:', notification.userId);
+        
+        // Only increment count if notification is from another user
+        if (notification.userId !== currentUser.id) {
+          setNotifications(prev => [...prev, {
+            id: Date.now(),
+            ...notification,
+            timestamp: new Date()
+          }]);
+          // Increment unread count
+          setUnreadCount(prev => {
+            console.log('Updating unread count from', prev, 'to', prev + 1);
+            return prev + 1;
+          });
+        } else {
+          console.log('Ignoring notification from self');
+        }
       });
 
       // Cleanup on unmount
@@ -83,7 +97,10 @@ export const SocketProvider = ({ children }) => {
 
   const sendMessage = (messageData) => {
     if (socket) {
+      console.log('Emitting sendMessage via socket:', messageData);
       socket.emit('sendMessage', messageData);
+    } else {
+      console.error('Socket not connected, cannot send message');
     }
   };
 
@@ -111,12 +128,18 @@ export const SocketProvider = ({ children }) => {
 
   const clearAllNotifications = () => {
     setNotifications([]);
+    setUnreadCount(0);
+  };
+
+  const markNotificationsAsRead = () => {
+    setUnreadCount(0);
   };
 
   const value = {
     socket,
     onlineUsers,
     notifications,
+    unreadCount,
     joinChat,
     leaveChat,
     sendMessage,
@@ -125,6 +148,7 @@ export const SocketProvider = ({ children }) => {
     stopTyping,
     removeNotification,
     clearAllNotifications,
+    markNotificationsAsRead,
     isUserOnline: (userId) => onlineUsers.some(user => user.userId === userId)
   };
 

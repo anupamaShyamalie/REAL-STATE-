@@ -1,5 +1,12 @@
 @use "../../responsive.scss" as res;
 
+.container {
+  max-width: 1199px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
 .homePage {
     display: flex;
     height: 100%;
@@ -7,21 +14,21 @@
     .textContainer {
       flex: 3;
 
-
       .wrapper{
-        padding-right: 100px;
+        padding: 0;
         display: flex;
         flex-direction: column;
         justify-content:center;
         gap: 50px;
         height: 100%;
+        padding-right: 15px;
 
         @include res.md{
           padding: 0;
         }
 
         @include res.sm{
-
+          padding: 0;
           justify-content: flex-start;
         }
 
@@ -52,24 +59,25 @@
   
     .imgContainer {
       flex: 2;
-      background-color:#F5F7FB;
       position: relative;
       display: flex;
       align-items: center;
+      padding: 0;
+      background-color: #F5F7FB;
 
       @include res.md{
         display: none;
       }
   
       img {
-        width: 115%;
-        position: absolute;
+        width: 100%;
+        position: relative;
         right: 0;
         animation: machineMotion 10s infinite;
         transform-origin: center;
 
         @include res.lg{
-          width: 105%;
+          width: 100%;
         }
       }
     }

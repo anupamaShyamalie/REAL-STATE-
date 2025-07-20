@@ -22,13 +22,14 @@
 
         input,select{
 
-            width: 100px;
+            width: 80px;
             padding: 10px;
             border:1px solid #cacfd2;
             border-radius: 5px;
             font-size: 14px;
             font-family: inherit;
             font-size: 10px;
+            
         }
 
 
@@ -45,7 +46,7 @@
     .bottom{
 
         display: flex;      
-        justify-content: space-between;
+      gap: 10px;
         
 
         .search{
@@ -62,7 +63,7 @@
                 width: 100px;
                 padding: 10px;
                 cursor: pointer;
-    
+              
                 .icon{
     
                     height: 24px;
@@ -71,8 +72,68 @@
                 }
     
             }
+            .clear-btn {
+                margin-left: 16px;
+                background: #f5f7fb;
+                color: #123458;
+                border: 1.5px solid red;
+                border-radius: 5px;
+                padding: 6px 10px;
+                font-size: 12px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                transition: background 0.2s, color 0.2s, border 0.2s;
+            }
+            .clear-btn:hover {
+                background: #ffeaea;
+                color: #b71c1c;
+            }
+            .clear-icon {
+                width: 20px;
+                height: 20px;
+                color: red !important;
+            }
         }
 
        
     }
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  white-space: nowrap;
+}
+
+.filter-header h1 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.clear-btn {
+  margin-left: 16px;
+  background: #f5f7fb;
+  color: #123458;
+  border: 1.5px solid red;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.clear-btn:hover {
+  background: #ffeaea;
+  color: #b71c1c;
+}
+.clear-icon {
+  width: 20px;
+  height: 20px;
+  color: red !important;
 }

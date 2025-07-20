@@ -1,0 +1,215 @@
+.notification-badge {
+  position: relative;
+  display: inline-block;
+
+  .notification-trigger {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: rgba(45, 51, 107, 0.1);
+    }
+
+    .icon {
+      font-size: 20px;
+      color: #2D336B;
+    }
+
+    .badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #ff4444;
+      color: white;
+      border-radius: 50%;
+      min-width: 18px;
+      height: 18px;
+      font-size: 11px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 4px;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      animation: pulse 2s infinite;
+    }
+  }
+
+  .notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 350px;
+    max-height: 400px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e0e0e0;
+    z-index: 1000;
+    margin-top: 8px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      right: 20px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid white;
+    }
+
+    .notification-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      border-bottom: 1px solid #e0e0e0;
+      background-color: #f9f9f9;
+      border-radius: 8px 8px 0 0;
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .clear-all-btn {
+        background: none;
+        border: none;
+        color: #2D336B;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: rgba(45, 51, 107, 0.1);
+        }
+      }
+    }
+
+    .notification-list {
+      max-height: 300px;
+      overflow-y: auto;
+
+      .no-notifications {
+        padding: 40px 20px;
+        text-align: center;
+        color: #666;
+        font-style: italic;
+      }
+
+      .notification-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 15px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #f8f9fa;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .notification-content {
+          flex: 1;
+          min-width: 0;
+
+          .message {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.4;
+            word-wrap: break-word;
+          }
+
+          .time {
+            font-size: 12px;
+            color: #999;
+          }
+        }
+
+        .remove-btn {
+          background: none;
+          border: none;
+          color: #999;
+          cursor: pointer;
+          font-size: 16px;
+          padding: 2px 6px;
+          border-radius: 50%;
+          margin-left: 10px;
+          transition: all 0.2s;
+          opacity: 0;
+
+          &:hover {
+            background-color: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            opacity: 1;
+          }
+        }
+
+        &:hover .remove-btn {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+// Pulse animation for badge
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .notification-badge {
+    .notification-dropdown {
+      width: 300px;
+      right: -50px;
+
+      &::before {
+        right: 70px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .notification-badge {
+    .notification-dropdown {
+      width: 280px;
+      right: -80px;
+
+      &::before {
+        right: 100px;
+      }
+    }
+  }
+} 

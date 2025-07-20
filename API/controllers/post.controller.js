@@ -2,8 +2,47 @@ import prisma from "../lib/prisma.js";
 
 export const getPosts = async (req, res) => {
     try {
-        // First, let's try a simpler approach - get all posts and handle null users
-        const posts = await prisma.post.findMany();
+        const { type, minPrice, maxPrice, city, property, bedroom, bathroom } = req.query;
+        
+        // Build filter conditions
+        const whereConditions = {};
+        
+        if (type && (type === 'buy' || type === 'rent')) {
+            whereConditions.type = type;
+        }
+        
+        if (minPrice || maxPrice) {
+            whereConditions.price = {};
+            if (minPrice) whereConditions.price.gte = parseInt(minPrice);
+            if (maxPrice) whereConditions.price.lte = parseInt(maxPrice);
+        }
+        
+        if (city) {
+            whereConditions.city = {
+                contains: city,
+                mode: 'insensitive'
+            };
+        }
+        
+        if (property) {
+            whereConditions.property = property;
+        }
+        
+        if (bedroom) {
+            whereConditions.bedroom = parseInt(bedroom);
+        }
+        
+        if (bathroom) {
+            whereConditions.bathroom = parseInt(bathroom);
+        }
+        
+        // Get posts with filters
+        const posts = await prisma.post.findMany({
+            where: whereConditions,
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
         
         // Get user info for each post that has a valid userId
         const postsWithUsers = await Promise.all(
@@ -332,5 +371,26 @@ export const deletePost = async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: "Failed to delete post" })
+    }
+}
+
+export const getLocations = async (req, res) => {
+    try {
+        const locations = await prisma.post.findMany({
+            select: {
+                city: true
+            },
+            distinct: ['city']
+        });
+        
+        const cities = locations
+            .map(location => location.city)
+            .filter(city => city && city.trim() !== '')
+            .sort();
+        
+        res.status(200).json(cities);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Failed to fetch locations" });
     }
 }

@@ -40,44 +40,51 @@
     }
 
     form {
-
         border: 1px solid gray;
         display: flex;
-        justify-content: space-between;
         height: 64px;
-        gap: 5px;
+        gap: 0;
+        border-radius: 0 5px 5px 5px !important;
+        overflow: hidden;
+        width: fit-content;
+        margin: 0;
 
         @include res.sm {
             flex-direction: column;
             border: none;
+            border-radius: 0;
         }
 
-        input {
-            border: none;
-            width: 100px;
+        select,
+        input[type="number"] {
+            border: 1px solid #ccc;
+            height: 100%;
             padding: 0 10px;
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+            background: inherit;
+            box-sizing: border-box;
+            outline: none;
+            margin: 0;
+            border-radius: 0;
+        }
 
-            @include res.lg {
-                padding: 0 5px;
+        select {
+            border-right: none;
+        }
 
-                &:nth-child(2),
-                :nth-child(3) {
-                    width: 140px;
-                }
-            }
+        input[type="number"] {
+            border-right: none;
+        }
 
-            @include res.md {
-              width: auto; 
-                &:nth-child(2),
-                :nth-child(3) {
-                    width: auto;
-                }
-            }
+        input[type="number"]:last-of-type {
+            border-right: 1px solid #ccc;
+        }
 
-            @include res.sm{
-                padding: 20px;
-                border-bottom: 1px solid gray;
-            }
+        select:focus,
+        input[type="number"]:focus {
+            border-color: #888;
         }
 
         button {
@@ -86,6 +93,10 @@
             background-color: #123458;
             padding: 16px;
             color: aliceblue;
+            border-radius: 0 0 5px 0;
+            margin-left: 0;
+            height: 100%;
+            align-self: stretch;
 
             @include res.sm{
                 padding: 10px;
@@ -96,5 +107,10 @@
                 height: 24px;
             }
         }
+    }
+
+    select option:disabled,
+    select option[value=''] {
+        color: #b0b0b0 !important;
     }
 }

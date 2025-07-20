@@ -3,11 +3,25 @@ import bcrypt from "bcrypt";
 
 export const getUsers = async (req, res) => {
     try {
-        const users = await prisma.user.findMany();
+        console.log("getUsers called, userId:", req.userId);
+        const users = await prisma.user.findMany({
+            where: {
+                id: {
+                    not: req.userId // Exclude current user
+                }
+            },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                avatar: true
+            }
+        });
+        console.log("Found users:", users);
         res.status(200).json(users)
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: "Faild to get users.! " })
+        res.status(500).json({ message: "Failed to get users!" })
     }
 }
 
@@ -83,3 +97,53 @@ export const deleteUser = async (req, res) => {
         res.status(500).json({ message: "Faild to delete user.! " })
     }
 }
+
+// Save a post for the logged-in user
+export const savePost = async (req, res) => {
+    const userId = req.userId;
+    const { postId } = req.body;
+    if (!postId) return res.status(400).json({ message: "Post ID is required" });
+    try {
+        // Create a SavedPost if it doesn't exist
+        await prisma.savedPost.upsert({
+            where: { userId_postId: { userId, postId } },
+            update: {},
+            create: { userId, postId }
+        });
+        res.status(200).json({ message: "Post saved" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Failed to save post" });
+    }
+};
+
+// Unsave a post for the logged-in user
+export const unsavePost = async (req, res) => {
+    const userId = req.userId;
+    const { postId } = req.body;
+    if (!postId) return res.status(400).json({ message: "Post ID is required" });
+    try {
+        await prisma.savedPost.delete({
+            where: { userId_postId: { userId, postId } }
+        });
+        res.status(200).json({ message: "Post unsaved" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Failed to unsave post" });
+    }
+};
+
+// Get all saved posts for the logged-in user
+export const getSavedPosts = async (req, res) => {
+    const userId = req.userId;
+    try {
+        const savedPosts = await prisma.savedPost.findMany({
+            where: { userId },
+            include: { post: true }
+        });
+        res.status(200).json(savedPosts.map(sp => sp.post));
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Failed to get saved posts" });
+    }
+};

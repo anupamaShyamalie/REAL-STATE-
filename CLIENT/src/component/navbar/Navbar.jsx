@@ -2,11 +2,18 @@ import { useState, useEffect, useContext } from 'react';
 import './navbar.scss';
 import { Link } from 'react-router';
 import { AuthContext } from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
 
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-   const {currentUser} = useContext(AuthContext);
+  const {currentUser} = useContext(AuthContext);
+  const { unreadCount } = useSocket();
+  
+  // Debug: Log unread count changes
+  useEffect(() => {
+    console.log('Navbar unread count:', unreadCount);
+  }, [unreadCount]);
 
   // Close menu when clicking outside or on escape key
   useEffect(() => {
@@ -62,7 +69,7 @@ const Navbar = () => {
               <img src={currentUser.avatar||"https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_640.png"} alt="" />
               <span>{currentUser.username}</span>
               <Link to="/profile" className='profile'>
-                <div className="notifications">3</div>
+                <div className="notifications">{unreadCount > 0 ? unreadCount : ''}</div>
                 Profile
               </Link>
             </div>

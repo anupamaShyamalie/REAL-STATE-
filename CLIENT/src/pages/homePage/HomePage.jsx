@@ -7,7 +7,7 @@ const HomePage = () => {
   const {currentUser} = useContext(AuthContext);
   console.log(currentUser)
   return (
-    <div className="homePage">
+    <div className="container homePage">
       <div className="textContainer">
         <div className="wrapper">
           <h1>Transform Your Space, Transform Your Life</h1>

@@ -1,28 +1,31 @@
-import express from 'express';
-import { 
-  getChats, 
-  createChat, 
-  getMessages, 
-  sendMessage, 
-  markAsRead, 
-  deleteMessage,
-  getUsers 
-} from '../controllers/chatController.js';
-import { verifyToken } from '../middleware/verifyToken.js';
+import express from "express";
+import { createChat, getChats, getMessages, sendMessage, markAsRead, deleteMessage, hideMessage } from "../controllers/chatController.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
-// Chat routes
-router.get('/', verifyToken, getChats);
-router.post('/', verifyToken, createChat);
+// All routes require authentication
+router.use(verifyToken);
 
-// User routes for chat (MOVE THIS BEFORE THE PARAMETERIZED ROUTES)
-router.get('/users', verifyToken, getUsers);
+// Create a new chat
+router.post("/", createChat);
 
-// Message routes
-router.get('/:chatId/messages', verifyToken, getMessages);
-router.post('/messages', verifyToken, sendMessage);
-router.patch('/messages/read', verifyToken, markAsRead);
-router.delete('/messages/:messageId', verifyToken, deleteMessage);
+// Get all chats for current user
+router.get("/", getChats);
+
+// Get messages for a specific chat
+router.get("/:chatId/messages", getMessages);
+
+// Send a message
+router.post("/:chatId/messages", sendMessage);
+
+// Mark messages as read
+router.put("/:chatId/read", markAsRead);
+
+// Delete a message
+router.delete("/messages/:messageId", deleteMessage);
+
+// Hide message from user's view
+router.post("/messages/:messageId/hide", hideMessage);
 
 export default router;
