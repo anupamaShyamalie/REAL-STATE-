@@ -179,8 +179,8 @@ export const addPost = async (req, res) => {
                 bathroom,
                 latitude,
                 longitude,
-                type,
-                property
+                type: type || 'rent', // Default to 'rent' if not provided
+                property: property || 'apartment' // Default to 'apartment' if not provided
             };
             
             // Only include postDetails if desc is provided or other detail fields exist
@@ -203,6 +203,18 @@ export const addPost = async (req, res) => {
             return res.status(400).json({ message: "Title is required" });
         }
         
+        // Validate enum values
+        const validTypes = ['buy', 'rent'];
+        const validProperties = ['apartment', 'house', 'condo', 'land'];
+        
+        if (postData.type && !validTypes.includes(postData.type)) {
+            return res.status(400).json({ message: "Invalid type. Must be 'buy' or 'rent'" });
+        }
+        
+        if (postData.property && !validProperties.includes(postData.property)) {
+            return res.status(400).json({ message: "Invalid property type. Must be 'apartment', 'house', 'condo', or 'land'" });
+        }
+        
         // Create the post
         const createData = {
             ...postData,
@@ -215,6 +227,8 @@ export const addPost = async (req, res) => {
                 create: postDetails
             };
         }
+        
+        console.log('Creating post with data:', JSON.stringify(createData, null, 2));
         
         const newPost = await prisma.post.create({
             data: createData,
