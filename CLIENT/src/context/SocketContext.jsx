@@ -129,10 +129,12 @@ export const SocketProvider = ({ children }) => {
   const clearAllNotifications = () => {
     setNotifications([]);
     setUnreadCount(0);
+    console.log('Unread count set to 0 by clearAllNotifications');
   };
 
   const markNotificationsAsRead = () => {
     setUnreadCount(0);
+    console.log('Unread count set to 0 by markNotificationsAsRead');
   };
 
   const value = {

@@ -2,7 +2,7 @@ import Slider from '../../component/slider/Slider'
 import './singlePage.scss'
 import { BedDouble, Bus, Dog, HandCoins, MapPinHouse, MapPinPlus, MessageCircle, Ruler, School, ShowerHead, Soup, Wrench } from 'lucide-react'
 import Map from '../../component/map/Map'
-import { Link, useLoaderData } from 'react-router'
+import { Link, useLoaderData } from 'react-router-dom'
 
 const SinglePage = () => {
   const posts = useLoaderData()

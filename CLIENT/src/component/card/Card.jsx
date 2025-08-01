@@ -1,12 +1,13 @@
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import './card.scss'
-import { Bath, Bed, Import, MapPinHouse, MessagesSquare, Bookmark } from 'lucide-react'
+import { Bath, Bed, MapPinHouse, MessagesSquare, Bookmark, Trash2, Pencil } from 'lucide-react'
 import { useContext, useState } from 'react'
 import { AuthContext } from '../../context/AuthContext'
 import apiRequest from '../../lib/apiRequest'
+import { useNavigate } from 'react-router-dom'
 
-const Card = ({ item }) => {
+const Card = ({ item, isSavedList, onRemoveSaved, onDelete, onDeleteNotification }) => {
   // Handle multiple possible image formats
   const getImageUrl = (item) => {
     // Check if item has images array
@@ -29,6 +30,9 @@ const Card = ({ item }) => {
   const { currentUser } = useContext(AuthContext)
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [removing, setRemoving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const navigate = useNavigate();
 
   const handleSave = async (e) => {
     e.stopPropagation()
@@ -42,11 +46,46 @@ const Card = ({ item }) => {
         await apiRequest.post('/users/unsave', { postId: item.id })
         setSaved(false)
       }
-    } catch (err) {
+    } catch {
       alert('Failed to update saved status.')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleRemoveSaved = async (e) => {
+    e.stopPropagation();
+    if (!currentUser) return alert('Please login.');
+    setRemoving(true);
+    try {
+      await apiRequest.post('/users/unsave', { postId: item.id });
+      if (onRemoveSaved) onRemoveSaved(item.id);
+    } catch {
+      alert('Failed to remove from saved list.');
+    } finally {
+      setRemoving(false);
+    }
+  }
+  
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await apiRequest.delete(`/posts/${item.id}`);
+      if (onDelete) onDelete(item.id, 'success');
+      if (onDeleteNotification) onDeleteNotification('success');
+      // Refresh the profile page to show updated list
+      window.location.reload();
+    } catch {
+      if (onDelete) onDelete(item.id, 'error');
+      if (onDeleteNotification) onDeleteNotification('error');
+    } finally {
+      setDeleting(false);
+    }
+  }
+  
+  // Add edit handler
+  const handleEdit = () => {
+    navigate(`/editpost/${item.id}`, { state: { post: item } });
   }
   
   return (
@@ -85,19 +124,47 @@ const Card = ({ item }) => {
           </div>
           <div className="icons">
             <div className="icon">
-              <Import size={12} />
-            </div>
-            <div className="icon">
               <MessagesSquare size={12} />
             </div>
             <div
               className="icon save-icon"
-              style={{ cursor: 'pointer', opacity: loading ? 0.5 : 1 }}
+              style={{ cursor: loading ? 0.5 : 1 }}
               title={saved ? 'Unsave this post' : 'Save this post'}
               onClick={handleSave}
             >
               <Bookmark fill={saved ? 'red' : 'none'} color={saved ? 'red' : 'gray'} size={16} />
             </div>
+            {isSavedList && (
+              <div
+                className="icon remove-saved-icon"
+                title="Remove from Saved"
+                onClick={handleRemoveSaved}
+                style={{ cursor: removing ? 'not-allowed' : 'pointer', opacity: removing ? 0.5 : 1, marginLeft: 12 }}
+              >
+                <Trash2 size={16} color="#e74c3c" />
+              </div>
+            )}
+            {/* Permanent delete button for user's own posts (not in saved list) */}
+            {!isSavedList && currentUser && item.userId === currentUser.id && (
+              <>
+                <div
+                  className="icon remove-saved-icon"
+                  title="Edit Post"
+                  onClick={handleEdit}
+                  style={{ cursor: 'pointer', marginLeft: 12 }}
+                >
+                  <Pencil size={16} color="#2D336B" />
+                </div>
+                <div
+                  className="icon remove-saved-icon"
+                  title="Delete Post"
+                  onClick={handleDelete}
+                  style={{ cursor: deleting ? 'not-allowed' : 'pointer', opacity: deleting ? 0.5 : 1, marginLeft: 12 }}
+                >
+                  <Trash2 size={16} color="#e74c3c" />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -121,7 +188,15 @@ Card.propTypes = {
     address: PropTypes.string.isRequired,
     bedroom: PropTypes.number.isRequired,
     bathroom: PropTypes.number.isRequired,
-  }).isRequired
+    userId: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]).isRequired,
+  }).isRequired,
+  isSavedList: PropTypes.bool,
+  onRemoveSaved: PropTypes.func,
+  onDelete: PropTypes.func,
+  onDeleteNotification: PropTypes.func,
 }
 
 export default Card

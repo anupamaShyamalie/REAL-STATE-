@@ -18,6 +18,7 @@ function Chat() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingMessage, setDeletingMessage] = useState(null);
   const [hiddenMessages, setHiddenMessages] = useState(new Set());
+  const [unreadCounts, setUnreadCounts] = useState({});
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -53,6 +54,12 @@ function Chat() {
         setLoading(true);
         const response = await apiRequest.get("/chat");
         setChats(response.data);
+        // Initialize unreadCounts from API
+        const counts = {};
+        response.data.forEach(chat => {
+          counts[chat.id] = chat.unreadCount || 0;
+        });
+        setUnreadCounts(counts);
       } catch (error) {
         console.error("Error fetching chats:", error);
       } finally {
@@ -66,18 +73,18 @@ function Chat() {
   // Load messages when chat is selected
   useEffect(() => {
     if (selectedChat) {
+      // Mark as read in backend
+      apiRequest.post(`/chat/${selectedChat.id}/markAsRead`).catch(console.error);
       const fetchMessages = async () => {
         try {
           const response = await apiRequest.get(`/chat/${selectedChat.id}/messages`);
           setMessages(response.data);
-          
-          // Mark messages as read when chat is opened
+          // Mark messages as read in frontend state
           markNotificationsAsRead();
         } catch (error) {
           console.error("Error fetching messages:", error);
         }
       };
-
       fetchMessages();
     }
   }, [selectedChat, markNotificationsAsRead]);
@@ -86,10 +93,13 @@ function Chat() {
   useEffect(() => {
     if (!socket) return;
 
-    // Listen for new messages
-    socket.on("newMessage", (message) => {
-      if (selectedChat && message.chatId === selectedChat.id) {
-        setMessages(prev => [...prev, message]);
+    // Listen for new messages and update unread counts
+    const handleNewMessage = (message) => {
+      if (!selectedChat || message.chatId !== selectedChat.id) {
+        setUnreadCounts(prev => ({
+          ...prev,
+          [message.chatId]: (prev[message.chatId] || 0) + 1
+        }));
       }
       // Update chat list with new message
       setChats(prev => prev.map(chat => 
@@ -97,7 +107,9 @@ function Chat() {
           ? { ...chat, lastMessage: message.text }
           : chat
       ));
-    });
+    };
+
+    socket.on("newMessage", handleNewMessage);
 
     // Listen for typing indicators
     socket.on("userTyping", ({ chatId, userId }) => {
@@ -113,11 +125,21 @@ function Chat() {
     });
 
     return () => {
-      socket.off("newMessage");
+      socket.off("newMessage", handleNewMessage);
       socket.off("userTyping");
       socket.off("userStopTyping");
     };
   }, [socket, selectedChat]);
+
+  // Reset unread count when chat is opened
+  useEffect(() => {
+    if (selectedChat) {
+      setUnreadCounts(prev => ({
+        ...prev,
+        [selectedChat.id]: 0
+      }));
+    }
+  }, [selectedChat]);
 
   // Join/leave chat rooms
   useEffect(() => {
@@ -330,6 +352,10 @@ function Chat() {
                     src={otherUser?.avatar || "https://cdn.pixabay.com/photo/2024/01/27/07/32/ai-generated-8535467_1280.jpg"}
                     alt={otherUser?.username}
                   />
+                  {/* Unread badge */}
+                  {unreadCounts[chat.id] > 0 && (
+                    <span className="unread-badge">{unreadCounts[chat.id]}</span>
+                  )}
                   <div className="online-indicator">
                     {isUserOnline(otherUser?.id) && <span className="online-dot"></span>}
                   </div>

@@ -115,7 +115,40 @@ export const getChats = async (req, res) => {
       }
     });
 
-    res.status(200).json(chats);
+    // Add unreadCount for each chat using ChatRead.lastSeen
+    const chatsWithUnread = await Promise.all(chats.map(async (chat) => {
+      // Find lastSeen for this user in this chat
+      const chatRead = await prisma.chatRead.findFirst({
+        where: {
+          chatId: chat.id,
+          userId: currentUserId
+        }
+      });
+      let unreadCount = 0;
+      if (chatRead) {
+        unreadCount = await prisma.message.count({
+          where: {
+            chatId: chat.id,
+            userId: { not: currentUserId },
+            createdAt: { gt: chatRead.lastSeen }
+          }
+        });
+      } else {
+        // If never opened, all messages from the other user are unread
+        unreadCount = await prisma.message.count({
+          where: {
+            chatId: chat.id,
+            userId: { not: currentUserId }
+          }
+        });
+      }
+      return {
+        ...chat,
+        unreadCount
+      };
+    }));
+
+    res.status(200).json(chatsWithUnread);
   } catch (error) {
     console.error('Error getting chats:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -245,27 +278,27 @@ export const markAsRead = async (req, res) => {
     const { chatId } = req.params;
     const currentUserId = req.userId;
 
-    // Verify user is part of this chat
-    const chat = await prisma.chat.findFirst({
+    // Upsert ChatRead for this user and chat
+    const existing = await prisma.chatRead.findFirst({
       where: {
-        id: chatId,
-        userIDs: {
-          has: currentUserId
+        chatId,
+        userId: currentUserId
+      }
+    });
+    if (existing) {
+      await prisma.chatRead.update({
+        where: { id: existing.id },
+        data: { lastSeen: new Date() }
+      });
+    } else {
+      await prisma.chatRead.create({
+        data: {
+          chatId,
+          userId: currentUserId,
+          lastSeen: new Date()
         }
-      }
-    });
-
-    if (!chat) {
-      return res.status(404).json({ message: 'Chat not found' });
+      });
     }
-
-    // Update chat's seenBy
-    await prisma.chat.update({
-      where: { id: chatId },
-      data: {
-        seenBy: currentUserId
-      }
-    });
 
     res.status(200).json({ message: 'Messages marked as read' });
   } catch (error) {

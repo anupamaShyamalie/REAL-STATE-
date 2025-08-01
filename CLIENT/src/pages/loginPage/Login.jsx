@@ -1,4 +1,4 @@
-import { Link, useNavigate} from "react-router";
+import { Link, useNavigate} from "react-router-dom";
 import "./login.scss";
 import { useContext, useState } from "react";
 import apiRequest from "../../lib/apiRequest";
@@ -128,27 +128,10 @@ function Login() {
                 <button 
                   type="submit" 
                   className={`loginButton ${isLoading ? 'loading' : ''}`}
-                  disabled={isLoading}
                 >
                   {isLoading ? 'Logging in...' : 'Login'}
                 </button>
               </form>
-              
-              <div className="divider">
-                <span>OR</span>
-              </div>
-              
-              <div className="socialLogin">
-                <button className="googleBtn" type="button">
-                  <i className="icon-google"></i>
-                  Login with Google
-                </button>
-              </div>
-              
-              <div className="registerLink">
-                Don&apos;t have an account?
-                 <Link to="/register">Register</Link>
-              </div>
             </div>
           </div>
         </div>

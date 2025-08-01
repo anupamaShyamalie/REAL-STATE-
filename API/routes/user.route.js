@@ -5,10 +5,10 @@ import {verifyToken} from "../middleware/verifyToken.js"
 const router= express.Router();
 
 router.get("/", verifyToken, getUsers)
+router.get("/saved", verifyToken, getSavedPosts)
 router.get("/:id", verifyToken, getUser)
 router.put("/:id", verifyToken, updateUser)
 router.delete("/:id", verifyToken, deleteUser)
-router.get("/saved", verifyToken, getSavedPosts)
 router.post("/save", verifyToken, savePost)
 router.post("/unsave", verifyToken, unsavePost)
 

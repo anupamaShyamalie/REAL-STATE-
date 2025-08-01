@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import "./register.scss";
 import { useState } from "react";
 import apiRequest from "../../lib/apiRequest";

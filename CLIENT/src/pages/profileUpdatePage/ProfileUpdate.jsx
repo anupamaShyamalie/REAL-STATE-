@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import "./profileupdate.css";
 import { AuthContext } from "../../context/AuthContext";
 import apiRequest from "../../lib/apiRequest";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import CloudinaryUploadWidget from "../../component/upload/CloudinaryUploadWidget";
 
 function ProfileUpdate() {

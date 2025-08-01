@@ -1,6 +1,6 @@
 import { Marker, Popup } from 'react-leaflet'
 import './pin.scss'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 const Pin = ({item}) => {

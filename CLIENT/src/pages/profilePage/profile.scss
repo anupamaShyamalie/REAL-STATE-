@@ -14,6 +14,21 @@
     overflow-y: scroll;
     padding-bottom: 50px;
 
+    /* Custom scrollbar styling to match List page */
+    scrollbar-width: thin;
+    scrollbar-color: #2D336B #f1f1f1;
+    &::-webkit-scrollbar {
+      width: 8px;
+      background: #f1f1f1;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #2D336B;
+      border-radius: 8px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #1a1e3a;
+    }
+
     @include md {
       flex: none;
       height: max-content;

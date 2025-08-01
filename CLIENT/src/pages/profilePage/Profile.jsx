@@ -1,15 +1,40 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./profile.scss";
 import List from "../../component/list/List";
 import Chat from "../../component/Chat/Chat";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import apiRequest from "../../lib/apiRequest";
 import { AuthContext } from "../../context/AuthContext";
+import '../../component/Chat/chat.scss';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Profile() {
   const { currentUser, updateUser } = useContext(AuthContext)
+  const [myPosts, setMyPosts] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [savedPosts, setSavedPosts] = useState([])
+  const [savedLoading, setSavedLoading] = useState(false)
+  const [savedError, setSavedError] = useState(null)
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    setLoading(true)
+    apiRequest.get(`/posts?userId=${currentUser.id}`)
+      .then(res => setMyPosts(res.data))
+      .catch(() => setError('Failed to fetch your posts'))
+      .finally(() => setLoading(false))
+
+    // Fetch saved posts
+    setSavedLoading(true)
+    apiRequest.get('/users/saved')
+      .then(res => setSavedPosts(res.data))
+      .catch(() => setSavedError('Failed to fetch saved posts'))
+      .finally(() => setSavedLoading(false))
+  }, [currentUser?.id])
 
   const handleLogout = async () => {
     try {
@@ -22,8 +47,36 @@ function Profile() {
     }
   }
 
+  // Handler to show toast notification after deletion
+  const handleDeleteNotification = (type) => {
+    if (type === 'success') {
+      toast.success('Your post was permanently deleted.', {
+        position: 'top-center',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+    } else {
+      toast.error('Failed to delete the post.', {
+        position: 'top-center',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+    }
+  }
+
   return (
     <div className="profilePage">
+      <ToastContainer />
       <div className="details">
         <div className="wrapper">
           <div className="title">
@@ -52,11 +105,17 @@ function Profile() {
             <h1>My List</h1>
             <button><Link to={'/newpost'}>Create New Post</Link></button>
           </div>
-          <List />
+          {loading ? (
+            <div>Loading...</div>
+          ) : error ? (
+            <div>{error}</div>
+          ) : (
+            <List data={myPosts} onDeleteNotification={handleDeleteNotification} />
+          )}
           <div className="title">
             <h1>Saved List</h1>
           </div>
-          <List />
+          <List data={savedPosts} loading={savedLoading} isSavedList />
         </div>
       </div>
       <div className="chatContainer">

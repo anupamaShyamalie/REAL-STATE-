@@ -2,7 +2,7 @@
 import { useContext, useEffect } from 'react'
 import Navbar from '../../component/navbar/Navbar'
 import './layout.scss'
-import { Navigate, Outlet } from 'react-router'
+import { Navigate, Outlet } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 
 const Layout = () => {

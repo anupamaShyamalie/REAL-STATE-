@@ -2,7 +2,7 @@ import prisma from "../lib/prisma.js";
 
 export const getPosts = async (req, res) => {
     try {
-        const { type, minPrice, maxPrice, city, property, bedroom, bathroom } = req.query;
+        const { type, minPrice, maxPrice, city, property, bedroom, bathroom, userId } = req.query;
         
         // Build filter conditions
         const whereConditions = {};
@@ -34,6 +34,11 @@ export const getPosts = async (req, res) => {
         
         if (bathroom) {
             whereConditions.bathroom = parseInt(bathroom);
+        }
+
+        // Add userId filter if provided
+        if (userId) {
+            whereConditions.userId = userId;
         }
         
         // Get posts with filters
@@ -349,12 +354,12 @@ export const updatePost = async (req, res) => {
 export const deletePost = async (req, res) => {
     const id = req.params.id;
     const tokenUserId = req.userId;
-    
+    console.log('Attempting to delete post:', { id, tokenUserId });
     try {
         const post = await prisma.post.findUnique({
             where: { id }
         });
-        
+        console.log('Found post:', post);
         if (!post) {
             return res.status(404).json({ message: "Post not found" });
         }
@@ -363,14 +368,24 @@ export const deletePost = async (req, res) => {
             return res.status(403).json({ message: "Not Authorized!" });
         }
 
+        // Delete related PostDetail records first
+        await prisma.postDetail.deleteMany({
+            where: { postId: id }
+        });
+
+        // Delete related SavedPost records
+        await prisma.savedPost.deleteMany({
+            where: { postId: id }
+        });
+
         await prisma.post.delete({
             where: { id }
         });
 
         res.status(200).json({ message: "Post deleted!" })
     } catch (err) {
-        console.log(err)
-        res.status(500).json({ message: "Failed to delete post" })
+        console.error('Error deleting post:', err);
+        res.status(500).json({ message: "Failed to delete post", error: err.message })
     }
 }
 

@@ -1,7 +1,7 @@
 // 4. Updated NewPostPage component with Gemini integration
 import { useState, useRef, useEffect } from "react";
 import "./newPost.scss";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import apiRequest from "../../lib/apiRequest";
 import CloudinaryUploadWidget from "../../component/upload/CloudinaryUploadWidget";
 import { GeminiChatService } from "../../lib/geminiService";
@@ -24,6 +24,9 @@ function NewPostPage() {
     const messagesEndRef = useRef(null);
     const navigate = useNavigate();
     const [error, setError] = useState("");
+    const params = useParams();
+    const location = useLocation();
+    const isEditMode = Boolean(params.id);
 
     // Cloudinary configuration
     const uwConfig = {
@@ -45,6 +48,20 @@ function NewPostPage() {
             [name]: value
         }));
     };
+
+    // Prefill state for edit mode
+    useEffect(() => {
+        if (isEditMode && params.id) {
+            apiRequest.get(`/posts/${params.id}`).then(res => {
+                const post = res.data;
+                setCurrentPropertyData({
+                    ...post,
+                    ...post.postDetails
+                });
+                setUploadedImages(post.images || []);
+            });
+        }
+    }, [isEditMode, params.id]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -84,17 +101,25 @@ function NewPostPage() {
                 restaurant: parseInt(inputs.restaurant) || null
             };
 
-            const res = await apiRequest.post('/posts', {
-                postData,
-                postDetails
-            });
+            if (isEditMode) {
+                await apiRequest.put(`/posts/${params.id}`, {
+                    postData,
+                    postDetails
+                });
+                navigate("/list");
+            } else {
+                const res = await apiRequest.post('/posts', {
+                    postData,
+                    postDetails
+                });
 
-            console.log("Post created successfully:", res.data);
-            navigate("/list");
+                console.log("Post created successfully:", res.data);
+                navigate("/list");
+            }
             
         } catch (err) {
             console.log(err);
-            setError(err.response?.data?.message || "Failed to create post. Please try again.");
+            setError(err.response?.data?.message || (isEditMode ? "Failed to update post. Please try again." : "Failed to create post. Please try again."));
         }
     };
 
@@ -157,7 +182,7 @@ function NewPostPage() {
     return (
         <div className="newPostPage">
             <div className="formContainer">
-                <h1>Add New Post</h1>
+                <h1>{isEditMode ? 'Edit Post' : 'Add New Post'}</h1>
 
                 <div className="imageUploadSection">
                     <h3>Property Images</h3>
@@ -196,6 +221,7 @@ function NewPostPage() {
                                 name="title" 
                                 type="text" 
                                 required 
+                                value={currentPropertyData.title || ''}
                                 onChange={handleFormChange}
                             />
                         </div>
@@ -206,6 +232,7 @@ function NewPostPage() {
                                 name="price" 
                                 type="number" 
                                 required 
+                                value={currentPropertyData.price || ''}
                                 onChange={handleFormChange}
                             />
                         </div>
@@ -216,6 +243,7 @@ function NewPostPage() {
                                 name="address" 
                                 type="text" 
                                 required 
+                                value={currentPropertyData.address || ''}
                                 onChange={handleFormChange}
                             />
                         </div>
@@ -225,6 +253,7 @@ function NewPostPage() {
                                 id="desc" 
                                 name="desc" 
                                 className="descriptionTextArea" 
+                                value={currentPropertyData.desc || ''}
                                 onChange={handleFormChange}
                             />
                         </div>
@@ -235,6 +264,7 @@ function NewPostPage() {
                                 id="city" 
                                 name="city" 
                                 type="text" 
+                                value={currentPropertyData.city || ''}
                                 onChange={handleFormChange}
                             />
                         </div>
@@ -245,7 +275,7 @@ function NewPostPage() {
                                 id="bedroom" 
                                 name="bedroom" 
                                 type="number" 
-                                defaultValue="1" 
+                                value={currentPropertyData.bedroom || 1}
                                 onChange={handleFormChange}
                             />
                         </div>
@@ -256,7 +286,7 @@ function NewPostPage() {
                                 id="bathroom" 
                                 name="bathroom" 
                                 type="number" 
-                                defaultValue="1" 
+                                value={currentPropertyData.bathroom || 1}
                                 onChange={handleFormChange}
                             />
                         </div>
@@ -266,6 +296,7 @@ function NewPostPage() {
                                 id="latitude" 
                                 name="latitude" 
                                 type="text" 
+                                value={currentPropertyData.latitude || ''}
                                 onChange={handleFormChange}
                             />
                         </div>
@@ -275,6 +306,7 @@ function NewPostPage() {
                                 id="longitude" 
                                 name="longitude" 
                                 type="text" 
+                                value={currentPropertyData.longitude || ''}
                                 onChange={handleFormChange}
                             />
                         </div>
@@ -282,7 +314,7 @@ function NewPostPage() {
                             <label htmlFor="type">Type</label>
                             <select 
                                 name="type" 
-                                defaultValue="rent" 
+                                value={currentPropertyData.type || 'rent'}
                                 onChange={handleFormChange}
                             >
                                 <option value="rent">Rent</option>
@@ -293,7 +325,7 @@ function NewPostPage() {
                             <label htmlFor="property">Property</label>
                             <select 
                                 name="property" 
-                                defaultValue="apartment" 
+                                value={currentPropertyData.property || 'apartment'}
                                 onChange={handleFormChange}
                             >
                                 <option value="apartment">Apartment</option>
@@ -304,7 +336,7 @@ function NewPostPage() {
                         </div>
                         <div className="item">
                             <label htmlFor="utilities">Utilities Policy</label>
-                            <select name="utilities" defaultValue="owner">
+                            <select name="utilities" value={currentPropertyData.utilities || 'owner'} onChange={handleFormChange}>
                                 <option value="owner">Owner is responsible</option>
                                 <option value="tenant">Tenant is responsible</option>
                                 <option value="shared">Shared</option>
@@ -312,7 +344,7 @@ function NewPostPage() {
                         </div>
                         <div className="item">
                             <label htmlFor="pet">Pet Policy</label>
-                            <select name="pet" defaultValue="allowed">
+                            <select name="pet" value={currentPropertyData.pet || 'allowed'} onChange={handleFormChange}>
                                 <option value="allowed">Allowed</option>
                                 <option value="not-allowed">Not Allowed</option>
                             </select>
@@ -324,6 +356,8 @@ function NewPostPage() {
                                 name="income"
                                 type="text"
                                 placeholder="Income Policy"
+                                value={currentPropertyData.income || ''}
+                                onChange={handleFormChange}
                             />
                         </div>
                         <div className="item">
@@ -333,23 +367,24 @@ function NewPostPage() {
                                 id="size" 
                                 name="size" 
                                 type="number" 
+                                value={currentPropertyData.size || ''}
                                 onChange={handleFormChange}
                             />
                         </div>
                         <div className="item">
                             <label htmlFor="school">School Distance</label>
-                            <input min={0} id="school" name="school" type="number" />
+                            <input min={0} id="school" name="school" type="number" value={currentPropertyData.school || ''} onChange={handleFormChange} />
                         </div>
                         <div className="item">
                             <label htmlFor="bus">Bus Stop Distance</label>
-                            <input min={0} id="bus" name="bus" type="number" />
+                            <input min={0} id="bus" name="bus" type="number" value={currentPropertyData.bus || ''} onChange={handleFormChange} />
                         </div>
                         <div className="item">
                             <label htmlFor="restaurant">Restaurant Distance</label>
-                            <input min={0} id="restaurant" name="restaurant" type="number" />
+                            <input min={0} id="restaurant" name="restaurant" type="number" value={currentPropertyData.restaurant || ''} onChange={handleFormChange} />
                         </div>
                         <button className="sendButton" type="submit">
-                            Add Property
+                            {isEditMode ? 'Update Property' : 'Add Property'}
                         </button>
                         {error && <span style={{color:"red", fontSize:"14px", marginTop:"10px", display:"block"}}>{error}</span>}
                     </form>

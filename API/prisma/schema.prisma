@@ -95,3 +95,10 @@ model SavedPost {
   createdAt DateTime @default(now())
   @@unique([userId, postId])
 }
+
+model ChatRead {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  chatId    String   @db.ObjectId
+  userId    String   @db.ObjectId
+  lastSeen  DateTime
+}

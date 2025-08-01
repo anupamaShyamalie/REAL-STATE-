@@ -61,6 +61,10 @@ function App() {
           path: "/newpost",
           element: <NewPostPage />
         },
+        {
+          path: "/editpost/:id",
+          element: <NewPostPage />
+        },
       ]
     }
   ]);

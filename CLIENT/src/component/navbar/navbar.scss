@@ -104,21 +104,7 @@
                 gap: 5px; /* icon and text spacing */
                 transition: transform 1s ease;
 
-                .notifications{
-                    position: absolute;
-                    top: -8px;
-                    right: -8px;
-                    background-color: green;
-                    color: white;
-                    font-size: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 50%;
-                    width: 18px;
-                    height: 18px;
-
-                }
+                // .notifications class removed
 
               }
               
