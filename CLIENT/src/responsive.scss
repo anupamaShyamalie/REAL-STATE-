@@ -1,23 +1,79 @@
 /* src/responsive.scss */
 
-/* sm: up to 767px wide */
+/* xs: up to 575px wide - Extra small devices */
+@mixin xs {
+  @media (max-width: 575px) {
+    @content;
+  }
+}
+
+/* sm: up to 767px wide - Small devices */
 @mixin sm {
-    @media (max-width: 767px) {
-      @content;
-    }
+  @media (max-width: 767px) {
+    @content;
   }
-  
-  /* md: up to 991px wide */
-  @mixin md {
-    @media (max-width: 991px) {
-      @content;
-    }
+}
+
+/* md: up to 991px wide - Medium devices */
+@mixin md {
+  @media (max-width: 991px) {
+    @content;
   }
-  
-  /* lg: up to 1199px wide */
-  @mixin lg {
-    @media (max-width: 1199px) {
-      @content;
-    }
+}
+
+/* lg: up to 1199px wide - Large devices */
+@mixin lg {
+  @media (max-width: 1199px) {
+    @content;
   }
+}
+
+/* xl: up to 1399px wide - Extra large devices */
+@mixin xl {
+  @media (max-width: 1399px) {
+    @content;
+  }
+}
+
+/* xxl: 1400px and above - Extra extra large devices */
+@mixin xxl {
+  @media (min-width: 1400px) {
+    @content;
+  }
+}
+
+/* Landscape orientation for mobile */
+@mixin landscape {
+  @media (orientation: landscape) and (max-height: 600px) {
+    @content;
+  }
+}
+
+/* Portrait orientation for mobile */
+@mixin portrait {
+  @media (orientation: portrait) {
+    @content;
+  }
+}
+
+/* High DPI displays */
+@mixin retina {
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    @content;
+  }
+}
+
+/* Touch devices */
+@mixin touch {
+  @media (hover: none) and (pointer: coarse) {
+    @content;
+  }
+}
+
+/* Non-touch devices */
+@mixin no-touch {
+  @media (hover: hover) and (pointer: fine) {
+    @content;
+  }
+}
   

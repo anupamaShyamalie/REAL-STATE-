@@ -1,104 +1,796 @@
 @use "../../responsive.scss" as res;
 
+// Global container styles
 .container {
-  max-width: 1199px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
   box-sizing: border-box;
 }
 
+// Main home page styles
 .homePage {
-    display: flex;
-    height: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   
-    .textContainer {
-      flex: 3;
-
-      .wrapper{
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content:center;
-        gap: 50px;
-        height: 100%;
-        padding-right: 15px;
-
-        @include res.md{
-          padding: 0;
-        }
-
-        @include res.sm{
-          padding: 0;
-          justify-content: flex-start;
-        }
-
-        p{
-            font-size: x-small;
-            text-align: justify;
-        }
-
-        .boxes{
-          display: flex;
-          justify-content: space-between;
-
-          @include res.sm {
-            display: none;
-          }
-
-          h2{
-            font-size: 20px;
-          }
-
-          h3{
-            font-size: 16px;
-            font-weight: 300;
-          }
-        }
-      }
+  // Hero Section
+  .hero-section {
+    padding: 80px 0 60px;
+    position: relative;
+    overflow: hidden;
+    
+    @include res.md {
+      padding: 60px 0 40px;
     }
-  
-    .imgContainer {
-      flex: 2;
-      position: relative;
-      display: flex;
+    
+    @include res.sm {
+      padding: 40px 0 30px;
+    }
+    
+    @include res.xs {
+      padding: 30px 0 20px;
+    }
+    
+    .hero-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
       align-items: center;
-      padding: 0;
-      background-color: #F5F7FB;
-
-      @include res.md{
-        display: none;
+      
+      @include res.md {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
       }
-  
-      img {
-        width: 100%;
+      
+      @include res.sm {
+        gap: 30px;
+      }
+      
+      @include res.xs {
+        gap: 20px;
+      }
+    }
+    
+    // Text Container
+    .text-container {
+      .hero-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.8s ease-out;
+        
+        @include res.sm {
+          font-size: 12px;
+          padding: 6px 12px;
+        }
+        
+        @include res.xs {
+          font-size: 11px;
+          padding: 5px 10px;
+        }
+      }
+      
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 24px;
+        color: #1a202c;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+        
+        .highlight {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        
+        @include res.lg {
+          font-size: 3rem;
+        }
+        
+        @include res.md {
+          font-size: 2.5rem;
+        }
+        
+        @include res.sm {
+          font-size: 2rem;
+          line-height: 1.3;
+        }
+        
+        @include res.xs {
+          font-size: 1.75rem;
+          line-height: 1.4;
+        }
+      }
+      
+      .hero-description {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #4a5568;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+        
+        @include res.md {
+          font-size: 1rem;
+        }
+        
+        @include res.sm {
+          font-size: 0.95rem;
+          margin-bottom: 30px;
+        }
+        
+        @include res.xs {
+          font-size: 0.9rem;
+          margin-bottom: 25px;
+        }
+      }
+      
+      .search-container {
+        margin-bottom: 50px;
+        animation: fadeInUp 0.8s ease-out 0.6s both;
+        
+        @include res.sm {
+          margin-bottom: 40px;
+        }
+        
+        @include res.xs {
+          margin-bottom: 30px;
+        }
+      }
+      
+      // Hero Stats
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        animation: fadeInUp 0.8s ease-out 0.8s both;
+        
+        @include res.md {
+          gap: 20px;
+        }
+        
+        @include res.sm {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+        
+        @include res.xs {
+          gap: 12px;
+        }
+        
+        .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 20px;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          
+          @include res.touch {
+            &:active {
+              transform: scale(0.98);
+            }
+          }
+          
+          @include res.no-touch {
+            &:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            }
+          }
+          
+          @include res.sm {
+            padding: 15px;
+          }
+          
+          @include res.xs {
+            padding: 12px;
+            gap: 8px;
+          }
+          
+          .stat-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+            
+            @include res.sm {
+              width: 40px;
+              height: 40px;
+            }
+            
+            @include res.xs {
+              width: 35px;
+              height: 35px;
+            }
+          }
+          
+          .stat-content {
+            h3 {
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: #1a202c;
+              margin: 0 0 4px 0;
+              
+              @include res.sm {
+                font-size: 1.25rem;
+              }
+              
+              @include res.xs {
+                font-size: 1.1rem;
+              }
+            }
+            
+            p {
+              font-size: 0.9rem;
+              color: #718096;
+              margin: 0;
+              
+              @include res.sm {
+                font-size: 0.85rem;
+              }
+              
+              @include res.xs {
+                font-size: 0.8rem;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Image Container
+    .image-container {
+      position: relative;
+      
+      @include res.md {
+        order: -1;
+      }
+      
+      .image-wrapper {
         position: relative;
-        right: 0;
-        animation: machineMotion 10s infinite;
-        transform-origin: center;
-
-        @include res.lg{
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        animation: fadeInRight 1s ease-out 0.4s both;
+        
+        @include res.sm {
+          border-radius: 16px;
+        }
+        
+        @include res.xs {
+          border-radius: 12px;
+        }
+        
+        img {
           width: 100%;
+          height: auto;
+          display: block;
+          transition: transform 0.3s ease;
+          
+          @include res.no-touch {
+            &:hover {
+              transform: scale(1.05);
+            }
+          }
+        }
+        
+        .floating-card {
+          position: absolute;
+          bottom: 20px;
+          left: 20px;
+          background: white;
+          padding: 16px;
+          border-radius: 12px;
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          animation: slideInUp 0.8s ease-out 1s both;
+          
+          @include res.sm {
+            bottom: 15px;
+            left: 15px;
+            padding: 12px;
+            gap: 8px;
+          }
+          
+          @include res.xs {
+            bottom: 10px;
+            left: 10px;
+            padding: 10px;
+            gap: 6px;
+          }
+          
+          .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border-radius: 8px;
+            color: white;
+            
+            @include res.sm {
+              width: 30px;
+              height: 30px;
+            }
+            
+            @include res.xs {
+              width: 25px;
+              height: 25px;
+            }
+          }
+          
+          .card-content {
+            h4 {
+              font-size: 0.9rem;
+              font-weight: 600;
+              color: #1a202c;
+              margin: 0 0 2px 0;
+              
+              @include res.sm {
+                font-size: 0.8rem;
+              }
+              
+              @include res.xs {
+                font-size: 0.75rem;
+              }
+            }
+            
+            p {
+              font-size: 0.75rem;
+              color: #718096;
+              margin: 0;
+              
+              @include res.sm {
+                font-size: 0.7rem;
+              }
+              
+              @include res.xs {
+                font-size: 0.65rem;
+              }
+            }
+          }
         }
       }
     }
   }
   
-  // Machine-style animation keyframes
-  @keyframes machineMotion {
-    0% {
-      transform: scale(1) rotate(0deg) translateX(0);
+  // Features Section
+  .features-section {
+    padding: 80px 0;
+    background: white;
+    
+    @include res.md {
+      padding: 60px 0;
     }
-    25% {
-      transform: scale(1.05) rotate(1deg) translateX(-5px);
+    
+    @include res.sm {
+      padding: 40px 0;
     }
-    50% {
-      transform: scale(0.95) rotate(-1deg) translateX(5px);
+    
+    @include res.xs {
+      padding: 30px 0;
     }
-    75% {
-      transform: scale(1.02) rotate(0.5deg) translateX(-3px);
+    
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+      
+      @include res.sm {
+        margin-bottom: 40px;
+      }
+      
+      @include res.xs {
+        margin-bottom: 30px;
+      }
+      
+      h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 16px;
+        
+        @include res.md {
+          font-size: 2rem;
+        }
+        
+        @include res.sm {
+          font-size: 1.75rem;
+        }
+        
+        @include res.xs {
+          font-size: 1.5rem;
+        }
+      }
+      
+      p {
+        font-size: 1.1rem;
+        color: #718096;
+        max-width: 600px;
+        margin: 0 auto;
+        
+        @include res.sm {
+          font-size: 1rem;
+        }
+        
+        @include res.xs {
+          font-size: 0.9rem;
+        }
+      }
     }
-    100% {
-      transform: scale(1) rotate(0deg) translateX(0);
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      
+      @include res.sm {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      @include res.xs {
+        gap: 15px;
+      }
+      
+      .feature-card {
+        background: white;
+        padding: 40px 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        
+        @include res.touch {
+          &:active {
+            transform: scale(0.98);
+          }
+        }
+        
+        @include res.no-touch {
+          &:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+          }
+        }
+        
+        @include res.sm {
+          padding: 30px 20px;
+        }
+        
+        @include res.xs {
+          padding: 25px 15px;
+        }
+        
+        .feature-icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 70px;
+          height: 70px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 16px;
+          color: white;
+          margin-bottom: 24px;
+          
+          @include res.sm {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+          }
+          
+          @include res.xs {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 16px;
+          }
+        }
+        
+        h3 {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #1a202c;
+          margin-bottom: 12px;
+          
+          @include res.sm {
+            font-size: 1.1rem;
+          }
+          
+          @include res.xs {
+            font-size: 1rem;
+          }
+        }
+        
+        p {
+          font-size: 0.95rem;
+          color: #718096;
+          line-height: 1.6;
+          margin: 0;
+          
+          @include res.sm {
+            font-size: 0.9rem;
+          }
+          
+          @include res.xs {
+            font-size: 0.85rem;
+          }
+        }
+      }
     }
   }
+  
+  // CTA Section
+  .cta-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+    
+    @include res.md {
+      padding: 60px 0;
+    }
+    
+    @include res.sm {
+      padding: 40px 0;
+    }
+    
+    @include res.xs {
+      padding: 30px 0;
+    }
+    
+    .cta-content {
+      max-width: 600px;
+      margin: 0 auto;
+      
+      h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        
+        @include res.md {
+          font-size: 2rem;
+        }
+        
+        @include res.sm {
+          font-size: 1.75rem;
+        }
+        
+        @include res.xs {
+          font-size: 1.5rem;
+        }
+      }
+      
+      p {
+        font-size: 1.1rem;
+        margin-bottom: 32px;
+        opacity: 0.9;
+        
+        @include res.sm {
+          font-size: 1rem;
+          margin-bottom: 24px;
+        }
+        
+        @include res.xs {
+          font-size: 0.9rem;
+          margin-bottom: 20px;
+        }
+      }
+      
+      .cta-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+        
+        @include res.sm {
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        @include res.xs {
+          gap: 12px;
+        }
+        
+        .btn-primary {
+          background: white;
+          color: #667eea;
+          border: none;
+          padding: 16px 32px;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          @include res.touch {
+            &:active {
+              transform: scale(0.98);
+            }
+          }
+          
+          @include res.no-touch {
+            &:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+            }
+          }
+          
+          @include res.sm {
+            padding: 14px 28px;
+            font-size: 0.95rem;
+          }
+          
+          @include res.xs {
+            padding: 12px 24px;
+            font-size: 0.9rem;
+          }
+        }
+        
+        .btn-secondary {
+          background: transparent;
+          color: white;
+          border: 2px solid white;
+          padding: 16px 32px;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          @include res.touch {
+            &:active {
+              transform: scale(0.98);
+            }
+          }
+          
+          @include res.no-touch {
+            &:hover {
+              background: white;
+              color: #667eea;
+              transform: translateY(-2px);
+            }
+          }
+          
+          @include res.sm {
+            padding: 14px 28px;
+            font-size: 0.95rem;
+          }
+          
+          @include res.xs {
+            padding: 12px 24px;
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Smooth scrolling
+html {
+  scroll-behavior: smooth;
+}
+
+// Responsive improvements
+@media (max-width: 480px) {
+  .container {
+    padding: 0 15px;
+  }
+  
+  .hero-section .hero-content .text-container .hero-title {
+    font-size: 1.75rem;
+  }
+  
+  .features-section .section-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .cta-section .cta-content h2 {
+    font-size: 1.5rem;
+  }
+}
+
+// Landscape orientation adjustments
+@include res.landscape {
+  .hero-section {
+    padding: 40px 0 30px;
+    
+    .hero-content {
+      gap: 30px;
+    }
+    
+    .text-container .hero-title {
+      font-size: 2rem;
+    }
+    
+    .text-container .hero-description {
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+    }
+  }
+  
+  .features-section {
+    padding: 40px 0;
+  }
+  
+  .cta-section {
+    padding: 40px 0;
+  }
+}
+
+// High DPI display optimizations
+@include res.retina {
+  .hero-section .image-container .image-wrapper img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+// Touch device optimizations
+@include res.touch {
+  .hero-section .image-container .image-wrapper .floating-card {
+    transform: scale(1.1);
+  }
+  
+  .features-section .features-grid .feature-card {
+    cursor: pointer;
+  }
+  
+  .cta-section .cta-buttons .btn-primary,
+  .cta-section .cta-buttons .btn-secondary {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
   

@@ -1,116 +1,324 @@
 @use "../../responsive.scss" as res;
 
 .search {
-    .type {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  @include res.sm {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .type {
+    display: flex;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
     
-        @include res.sm{
-            margin-bottom: 5px;
-        }
-        button {
-            padding: 12px 20px;
-            border: 1px solid gray;
-            border-bottom: none;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-            cursor: pointer;
-            background-color: white;
-
-            &.active {
-                background-color: #123458;
-                color: white;
-            }
-
-            &:first-child {
-                border-top-left-radius: 5px;
-                border-right: none;
-
-                @include res.sm{
-                    border: 1px solid gray;
-                }
-            }
-
-            &:last-child {
-                border-top-right-radius: 5px;
-                border-left: none;
-            }
-
-            @include res.sm{
-                border: 1px solid gray;
-            }
-        }
+    @include res.sm {
+      flex-direction: column;
+      background: transparent;
+      border-bottom: none;
+      margin-bottom: 0;
     }
+    
+    button {
+      flex: 1;
+      padding: 16px 24px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #64748b;
+      position: relative;
+      
+      @include res.sm {
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: white;
+        font-size: 0.9rem;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
 
-    form {
-        border: 1px solid gray;
-        display: flex;
-        height: 64px;
-        gap: 0;
-        border-radius: 0 5px 5px 5px !important;
-        overflow: hidden;
-        width: fit-content;
-        margin: 0;
-
+      &.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 600;
+        
         @include res.sm {
-            flex-direction: column;
-            border: none;
-            border-radius: 0;
+          border-color: #667eea;
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
+      }
 
-        select,
-        input[type="number"] {
-            border: 1px solid #ccc;
-            height: 100%;
-            padding: 0 10px;
-            font-family: inherit;
-            font-size: inherit;
-            color: inherit;
-            background: inherit;
-            box-sizing: border-box;
-            outline: none;
-            margin: 0;
-            border-radius: 0;
+      &:hover:not(.active) {
+        background: #f1f5f9;
+        color: #475569;
+        
+        @include res.sm {
+          background: #f8fafc;
         }
+      }
 
-        select {
-            border-right: none;
+      &:first-child {
+        border-top-left-radius: 16px;
+        
+        @include res.sm {
+          border-radius: 8px;
         }
+      }
 
-        input[type="number"] {
-            border-right: none;
+      &:last-child {
+        border-top-right-radius: 16px;
+        
+        @include res.sm {
+          border-radius: 8px;
         }
+      }
+    }
+  }
 
-        input[type="number"]:last-of-type {
-            border-right: 1px solid #ccc;
-        }
-
-        select:focus,
-        input[type="number"]:focus {
-            border-color: #888;
-        }
-
-        button {
-            border: none;
-            cursor: pointer;
-            background-color: #123458;
-            padding: 16px;
-            color: aliceblue;
-            border-radius: 0 0 5px 0;
-            margin-left: 0;
-            height: 100%;
-            align-self: stretch;
-
-            @include res.sm{
-                padding: 10px;
-            }
-
-            img {
-                width: 24px;
-                height: 24px;
-            }
-        }
+  form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+    height: auto;
+    
+    @include res.md {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 20px;
+    }
+    
+    @include res.sm {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 16px;
     }
 
-    select option:disabled,
-    select option[value=''] {
-        color: #b0b0b0 !important;
+    select,
+    input[type="number"] {
+      border: 1px solid #e2e8f0;
+      height: 56px;
+      padding: 0 16px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: #1a202c;
+      background: white;
+      box-sizing: border-box;
+      outline: none;
+      margin: 0;
+      border-radius: 0;
+      transition: all 0.3s ease;
+      
+      @include res.md {
+        border-radius: 8px;
+        height: 48px;
+        padding: 0 12px;
+        font-size: 0.9rem;
+      }
+      
+      @include res.sm {
+        height: 48px;
+        padding: 0 12px;
+        font-size: 0.9rem;
+      }
+
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+      
+      &::placeholder {
+        color: #94a3b8;
+      }
     }
+
+    select {
+      border-right: none;
+      
+      @include res.md {
+        border-right: 1px solid #e2e8f0;
+      }
+      
+      @include res.sm {
+        border-right: 1px solid #e2e8f0;
+      }
+    }
+
+    input[type="number"] {
+      border-right: none;
+      
+      @include res.md {
+        border-right: 1px solid #e2e8f0;
+      }
+      
+      @include res.sm {
+        border-right: 1px solid #e2e8f0;
+      }
+    }
+
+    input[type="number"]:last-of-type {
+      border-right: 1px solid #e2e8f0;
+      
+      @include res.md {
+        border-right: 1px solid #e2e8f0;
+      }
+      
+      @include res.sm {
+        border-right: 1px solid #e2e8f0;
+      }
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 0 24px;
+      color: white;
+      border-radius: 0 0 16px 0;
+      margin-left: 0;
+      height: 56px;
+      align-self: stretch;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      @include res.md {
+        border-radius: 8px;
+        height: 48px;
+        padding: 0 20px;
+        font-size: 0.9rem;
+        grid-column: span 2;
+      }
+      
+      @include res.sm {
+        border-radius: 8px;
+        height: 48px;
+        padding: 0 20px;
+        font-size: 0.9rem;
+        grid-column: span 1;
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+        
+        @include res.sm {
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+
+  select option:disabled,
+  select option[value=''] {
+    color: #94a3b8 !important;
+  }
+  
+  select option {
+    color: #1a202c;
+    background: white;
+    padding: 8px 12px;
+  }
+}
+
+// Responsive improvements for very small screens
+@media (max-width: 480px) {
+  .search {
+    .type {
+      button {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+      }
+    }
+    
+    form {
+      padding: 12px;
+      gap: 8px;
+      
+      select,
+      input[type="number"] {
+        height: 44px;
+        padding: 0 10px;
+        font-size: 0.85rem;
+      }
+      
+      button {
+        height: 44px;
+        padding: 0 16px;
+        font-size: 0.85rem;
+        
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+  }
+}
+
+// Focus states for accessibility
+.search form select:focus,
+.search form input[type="number"]:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+// Loading state for search button
+.search form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+// Animation for search form
+.search form {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
