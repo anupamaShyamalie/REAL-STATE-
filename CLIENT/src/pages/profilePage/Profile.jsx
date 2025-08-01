@@ -8,6 +8,7 @@ import { AuthContext } from "../../context/AuthContext";
 import '../../component/Chat/chat.scss';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { User, Mail, LogOut, Plus, Bookmark, Settings, Home, MessageCircle, Calendar, Star } from 'lucide-react';
 
 function Profile() {
   const { currentUser, updateUser } = useContext(AuthContext)
@@ -17,6 +18,7 @@ function Profile() {
   const [savedPosts, setSavedPosts] = useState([])
   const [savedLoading, setSavedLoading] = useState(false)
   const [savedError, setSavedError] = useState(null)
+  const [activeTab, setActiveTab] = useState('profile')
 
   const navigate = useNavigate();
 
@@ -41,7 +43,6 @@ function Profile() {
       await apiRequest.post("/auth/logout");
       updateUser(null)
       navigate("/");
-
     } catch (err) {
       console.log(err);
     }
@@ -74,58 +75,231 @@ function Profile() {
     }
   }
 
+  const getDefaultAvatar = (username) => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=667eea&color=fff&size=128&font-size=0.4`;
+  };
+
   return (
     <div className="profilePage">
       <ToastContainer />
-      <div className="details">
-        <div className="wrapper">
-          <div className="title">
-            <h1>User Information</h1>
-            <Link to={"/profile/update"}>
-            <button >Update Profile</button>
-            </Link>
+      
+      <div className="profile-container">
+        <div className="profile-header">
+          <div className="header-content">
+            <div className="user-info">
+              <div className="avatar-section">
+                <img
+                  src={currentUser.avatar || getDefaultAvatar(currentUser.username)}
+                  alt="User avatar"
+                  className="user-avatar"
+                />
+                <div className="avatar-overlay">
+                  <Settings size={20} />
+                </div>
+              </div>
+              <div className="user-details">
+                <h1 className="username">{currentUser.username}</h1>
+                <p className="user-email">{currentUser.email}</p>
+                <div className="user-stats">
+                  <div className="stat-item">
+                    <Home size={16} />
+                    <span>{myPosts.length} Properties</span>
+                  </div>
+                  <div className="stat-item">
+                    <Bookmark size={16} />
+                    <span>{savedPosts.length} Saved</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="header-actions">
+              <Link to="/profile/update" className="btn-primary">
+                <Settings size={18} />
+                Edit Profile
+              </Link>
+              <button onClick={handleLogout} className="btn-outline">
+                <LogOut size={18} />
+                Logout
+              </button>
+            </div>
           </div>
-          <div className="info">
-            <span>
-              Avatar:
-              <img
-                src={currentUser.avatar || "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_640.png"}
-                alt="User avatar"
-              />
-            </span>
-            <span>
-              Username: <b>{currentUser.username}</b>
-            </span>
-            <span>
-              E-mail: <b>{currentUser.email}</b>
-            </span>
-            <button onClick={handleLogout}>Logout</button>
+        </div>
+
+        <div className="profile-content">
+          <div className="content-tabs">
+            <button 
+              className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
+              onClick={() => setActiveTab('profile')}
+            >
+              <User size={18} />
+              Profile
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'my-posts' ? 'active' : ''}`}
+              onClick={() => setActiveTab('my-posts')}
+            >
+              <Home size={18} />
+              My Properties
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'saved' ? 'active' : ''}`}
+              onClick={() => setActiveTab('saved')}
+            >
+              <Bookmark size={18} />
+              Saved Properties
+            </button>
           </div>
-          <div className="title">
-            <h1>My List</h1>
-            <button><Link to={'/newpost'}>Create New Post</Link></button>
+
+          <div className="tab-content">
+            {activeTab === 'profile' && (
+              <div className="profile-tab">
+                <div className="profile-card">
+                  <div className="card-header">
+                    <h2>Personal Information</h2>
+                    <p>Manage your account details and preferences</p>
+                  </div>
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <div className="info-icon">
+                        <User size={20} />
+                      </div>
+                      <div className="info-content">
+                        <label>Username</label>
+                        <span>{currentUser.username}</span>
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <div className="info-icon">
+                        <Mail size={20} />
+                      </div>
+                      <div className="info-content">
+                        <label>Email Address</label>
+                        <span>{currentUser.email}</span>
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <div className="info-icon">
+                        <Calendar size={20} />
+                      </div>
+                      <div className="info-content">
+                        <label>Member Since</label>
+                        <span>January 2024</span>
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <div className="info-icon">
+                        <Star size={20} />
+                      </div>
+                      <div className="info-content">
+                        <label>Account Status</label>
+                        <span className="status-badge">Verified</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-actions">
+                    <Link to="/profile/update" className="btn-primary">
+                      <Settings size={18} />
+                      Update Profile
+                    </Link>
+                    <button onClick={handleLogout} className="btn-outline">
+                      <LogOut size={18} />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'my-posts' && (
+              <div className="my-posts-tab">
+                <div className="section-header">
+                  <div className="header-content">
+                    <h2>My Properties</h2>
+                    <p>Manage your property listings and create new ones</p>
+                  </div>
+                  <Link to="/newpost" className="btn-primary">
+                    <Plus size={18} />
+                    Add New Property
+                  </Link>
+                </div>
+                
+                {loading ? (
+                  <div className="loading-state">
+                    <div className="loading-spinner"></div>
+                    <p>Loading your properties...</p>
+                  </div>
+                ) : error ? (
+                  <div className="error-state">
+                    <div className="error-icon">⚠️</div>
+                    <p>{error}</p>
+                    <button onClick={() => window.location.reload()} className="btn-outline">
+                      Try Again
+                    </button>
+                  </div>
+                ) : myPosts.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">🏠</div>
+                    <h3>No Properties Yet</h3>
+                    <p>Start by creating your first property listing</p>
+                    <Link to="/newpost" className="btn-primary">
+                      <Plus size={18} />
+                      Create First Property
+                    </Link>
+                  </div>
+                ) : (
+                  <List data={myPosts} onDeleteNotification={handleDeleteNotification} />
+                )}
+              </div>
+            )}
+
+            {activeTab === 'saved' && (
+              <div className="saved-tab">
+                <div className="section-header">
+                  <div className="header-content">
+                    <h2>Saved Properties</h2>
+                    <p>Your favorite properties and bookmarks</p>
+                  </div>
+                </div>
+                
+                {savedLoading ? (
+                  <div className="loading-state">
+                    <div className="loading-spinner"></div>
+                    <p>Loading saved properties...</p>
+                  </div>
+                ) : savedError ? (
+                  <div className="error-state">
+                    <div className="error-icon">⚠️</div>
+                    <p>{savedError}</p>
+                    <button onClick={() => window.location.reload()} className="btn-outline">
+                      Try Again
+                    </button>
+                  </div>
+                ) : savedPosts.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">🔖</div>
+                    <h3>No Saved Properties</h3>
+                    <p>Start exploring and save properties you like</p>
+                    <Link to="/" className="btn-primary">
+                      <Home size={18} />
+                      Browse Properties
+                    </Link>
+                  </div>
+                ) : (
+                  <List data={savedPosts} loading={savedLoading} isSavedList />
+                )}
+              </div>
+            )}
           </div>
-          {loading ? (
-            <div>Loading...</div>
-          ) : error ? (
-            <div>{error}</div>
-          ) : (
-            <List data={myPosts} onDeleteNotification={handleDeleteNotification} />
-          )}
-          <div className="title">
-            <h1>Saved List</h1>
-          </div>
-          <List data={savedPosts} loading={savedLoading} isSavedList />
         </div>
       </div>
-      <div className="chatContainer">
-        <div className="wrapper">
+
+      <div className="chat-container">
+        <div className="chat-wrapper">
           <Chat />
         </div>
       </div>
     </div>
   )
-
 }
 
 export default Profile;
