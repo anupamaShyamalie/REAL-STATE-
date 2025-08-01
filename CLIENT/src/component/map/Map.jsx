@@ -136,7 +136,7 @@ const Map = ({ items }) => {
           ref={mapRef}
           key={mapKey}
           center={center} 
-          zoom={bounds ? 10 : 13} 
+          zoom={bounds ? 4 : 6} 
           scrollWheelZoom={true}
           className='map'
           zoomControl={true}
@@ -155,7 +155,7 @@ const Map = ({ items }) => {
               try {
                 map.fitBounds(bounds, {
                   padding: [20, 20],
-                  maxZoom: 15
+                  maxZoom: 8
                 });
               } catch (error) {
                 console.error('Error fitting bounds:', error);
