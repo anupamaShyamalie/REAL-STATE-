@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Search, Paintbrush } from 'lucide-react';
+import { Search, RotateCcw } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import apiRequest from '../../lib/apiRequest';
 import './filter.scss';
@@ -72,11 +72,14 @@ const Filter = () => {
   return (
     <form className='filter' onSubmit={handleSubmit}>
       <div className="filter-header">
-        <h1>Search results for <b>{cityTitle}</b></h1>
+        <div className="header-content">
+          <h2>Search Filters</h2>
+          <p className="filter-subtitle">Refine your property search</p>
+        </div>
         <button
           type="button"
           className="clear-btn"
-          title="Clear filters"
+          title="Clear all filters"
           onClick={() => {
             setFilters({
               city: '',
@@ -90,60 +93,109 @@ const Filter = () => {
             navigate('/list');
           }}
         >
-          <Paintbrush className="clear-icon" color="red" />
+          <RotateCcw className="clear-icon" />
+          <span>Clear All</span>
         </button>
       </div>
-      <div className="top">
-        <div className="item">
-          <label htmlFor="city">City</label>
-          <input
-            type="text"
-            placeholder="City location"
-            id="city"
-            name="city"
-            value={filters.city}
-            onChange={handleChange}
-          />
+
+      <div className="filter-content">
+        <div className="filter-section">
+          <h3 className="section-title">Location</h3>
+          <div className="item">
+            <label htmlFor="city">City Location</label>
+            <input
+              type="text"
+              placeholder="Enter city name"
+              id="city"
+              name="city"
+              value={filters.city}
+              onChange={handleChange}
+            />
+          </div>
         </div>
-      </div>
-      <div className="bottom">
-        <div className="item">
-          <label htmlFor="type">Type</label>
-          <select name="type" id="type" value={filters.type} onChange={handleChange}>
-            <option value="">Any</option>
-            <option value="buy">Buy</option>
-            <option value="rent">Rent</option>
-          </select>
+
+        <div className="filter-section">
+          <h3 className="section-title">Property Details</h3>
+          <div className="item">
+            <label htmlFor="type">Transaction Type</label>
+            <select name="type" id="type" value={filters.type} onChange={handleChange}>
+              <option value="">Any Type</option>
+              <option value="buy">Buy</option>
+              <option value="rent">Rent</option>
+            </select>
+          </div>
+          <div className="item">
+            <label htmlFor="property">Property Type</label>
+            <select name="property" id="property" value={filters.property} onChange={handleChange}>
+              <option value="">Any Property</option>
+              <option value="apartment">Apartment</option>
+              <option value="house">House</option>
+              <option value="condo">Condo</option>
+              <option value="land">Land</option>
+            </select>
+          </div>
         </div>
-        <div className="item">
-          <label htmlFor="property">Property</label>
-          <select name="property" id="property" value={filters.property} onChange={handleChange}>
-            <option value="">Any</option>
-            <option value="apartment">Apartment</option>
-            <option value="house">House</option>
-            <option value="condo">Condo</option>
-            <option value="land">Land</option>
-          </select>
+
+        <div className="filter-section">
+          <h3 className="section-title">Price Range</h3>
+          <div className="price-inputs">
+            <div className="item">
+              <label htmlFor="minPrice">Min Price</label>
+              <input 
+                type="number" 
+                placeholder='$0' 
+                id='minPrice' 
+                name='minPrice' 
+                value={filters.minPrice} 
+                onChange={handleChange} 
+              />
+            </div>
+            <div className="item">
+              <label htmlFor="maxPrice">Max Price</label>
+              <input 
+                type="number" 
+                placeholder='$1,000,000' 
+                id='maxPrice' 
+                name='maxPrice' 
+                value={filters.maxPrice} 
+                onChange={handleChange} 
+              />
+            </div>
+          </div>
         </div>
-        <div className="item">
-          <label htmlFor="minPrice">Min Price</label>
-          <input type="number" placeholder='Any' id='minPrice' name='minPrice' value={filters.minPrice} onChange={handleChange} />
+
+        <div className="filter-section">
+          <h3 className="section-title">Rooms</h3>
+          <div className="room-inputs">
+            <div className="item">
+              <label htmlFor="bedroom">Bedrooms</label>
+              <input 
+                type="number" 
+                placeholder='Any' 
+                id='bedroom' 
+                name='bedroom' 
+                value={filters.bedroom} 
+                onChange={handleChange} 
+              />
+            </div>
+            <div className="item">
+              <label htmlFor="bathroom">Bathrooms</label>
+              <input 
+                type="number" 
+                placeholder='Any' 
+                id='bathroom' 
+                name='bathroom' 
+                value={filters.bathroom} 
+                onChange={handleChange} 
+              />
+            </div>
+          </div>
         </div>
-        <div className="item">
-          <label htmlFor="maxPrice">Max Price</label>
-          <input type="number" placeholder='Any' id='maxPrice' name='maxPrice' value={filters.maxPrice} onChange={handleChange} />
-        </div>
-        <div className="item">
-          <label htmlFor="bedroom">Bedroom</label>
-          <input type="number" placeholder='Any' id='bedroom' name='bedroom' value={filters.bedroom} onChange={handleChange} />
-        </div>
-        <div className="item">
-          <label htmlFor="bathroom">Bathroom</label>
-          <input type="number" placeholder='Any' id='bathroom' name='bathroom' value={filters.bathroom} onChange={handleChange} />
-        </div>
-        <div className="search">
-          <button type="submit">
-            <Search className='icon' />
+
+        <div className="search-section">
+          <button type="submit" className="search-btn">
+            <Search className='search-icon' />
+            <span>Search Properties</span>
           </button>
         </div>
       </div>
