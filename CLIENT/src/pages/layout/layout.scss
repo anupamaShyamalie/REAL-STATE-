@@ -2,12 +2,7 @@
 @use "../../responsive.scss" as res;
 
 .layout {
-  height: 100vh;
-  max-width: 1199px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 20px;
-  padding-right: 20px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   
@@ -26,8 +21,67 @@
     /* styles for screens below 767px */
   }
 
-  .content{
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  .content {
     flex: 1;
-    height: 80vh;
+    margin-top: 80px; /* Account for fixed navbar height */
+    min-height: calc(100vh - 80px);
+    
+    @include res.sm {
+      margin-top: 70px;
+      min-height: calc(100vh - 70px);
+    }
+    
+    @include res.xs {
+      margin-top: 65px;
+      min-height: calc(100vh - 65px);
+    }
+  }
+}
+
+// Ensure proper spacing for pages with full-width content
+.homePage {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+// Smooth scrolling for anchor links
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Account for fixed navbar */
+  
+  @include res.sm {
+    scroll-padding-top: 70px;
+  }
+  
+  @include res.xs {
+    scroll-padding-top: 65px;
+  }
+}
+
+// Prevent body scroll when mobile menu is open
+body.menu-open {
+  overflow: hidden;
+}
+
+// Responsive container adjustments
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  
+  @include res.sm {
+    padding: 0 16px;
+  }
+  
+  @include res.xs {
+    padding: 0 12px;
   }
 }
