@@ -1,205 +1,431 @@
-.card {
+@use "../../responsive.scss" as res;
 
-    display: flex;
-    gap: 20px;
+.card {
+  display: flex;
+  gap: 20px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  border: 1px solid #f1f5f9;
+  
+  @include res.sm {
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  @include res.xs {
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  @include res.no-touch {
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      border-color: #e2e8f0;
+    }
+  }
+  
+  @include res.touch {
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  // Grid View Mode
+  &.grid {
+    flex-direction: column;
+    gap: 16px;
+    
+    @include res.sm {
+      gap: 12px;
+    }
+    
+    @include res.xs {
+      gap: 8px;
+    }
 
     .imgContainer {
-
-        flex: 2;
-        height: 150px;
-
-        img {
-
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-
+      flex: none;
+      height: 200px;
+      
+      @include res.sm {
+        height: 160px;
+      }
+      
+      @include res.xs {
+        height: 140px;
+      }
     }
 
     .textContainer {
-
-        flex: 3;
-        display: flex;
-        flex-direction: column;
+      flex: 1;
+      gap: 12px;
+      
+      @include res.sm {
         gap: 10px;
+      }
+      
+      @include res.xs {
+        gap: 8px;
+      }
 
-        img {
-
-            width: 10px;
-            height: 10px;
+      .bottom {
+        flex-direction: column;
+        gap: 12px;
+        
+        @include res.sm {
+          gap: 10px;
+        }
+        
+        @include res.xs {
+          gap: 8px;
         }
 
-        .title {
-
-            font-size: 16px;
-            font-weight: 600;
-            color: #444;
-            transition: all 0.4s ease;
-
-            &:hover {
-
-                scale: 1.01;
-                color: black;
-            }
-
+        .features {
+          justify-content: flex-start;
+          
+          @include res.sm {
+            flex-wrap: wrap;
+          }
         }
 
-        .address {
-
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #123458;
+        .icons {
+          justify-content: flex-end;
         }
-
-        .price {
-
-            font-size: 10px;
-
-            .custom-chip {
-                border: 1px solid #ffcc00;
-                background-color: #fff8e1;
-                color: #ff9900;
-                padding: 2px 8px;
-                border-radius: 12px;
-                font-weight: bold;
-            }
-
-        }
-
-        .bottom {
-
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-
-            .features {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 5px;
-                font-size: 12px;
-
-                .feature {
-
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    background-color: #123458;
-                    padding: 2px 8px;
-                    border-radius: 10px;
-                   
-                    color: white;
-
-                }
-            }
-
-            .icons{
-
-                display: flex;
-                gap: 10px;
-
-                .icon{
-                    display: flex;
-                    align-items: center;
-                    color:white;
-                    background-color: #ff6666;
-                    border-radius: 50%;
-                    padding: 3px 5px;
-                }
-            }
-        }
-
+      }
     }
-}
-.save-icon {
-  cursor: pointer;
-  transition: transform 0.1s, color 0.1s;
-  &:hover {
-    transform: scale(1.15);
-    color: red;
+  }
+
+  .imgContainer {
+    flex: 2;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    
+    @include res.sm {
+      height: 120px;
+    }
+    
+    @include res.xs {
+      height: 100px;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      
+      @include res.no-touch {
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+
+  .textContainer {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    
+    @include res.sm {
+      gap: 10px;
+    }
+    
+    @include res.xs {
+      gap: 8px;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a202c;
+      margin: 0;
+      line-height: 1.3;
+      transition: all 0.3s ease;
+      
+      @include res.sm {
+        font-size: 1rem;
+      }
+      
+      @include res.xs {
+        font-size: 0.9rem;
+      }
+      
+      @include res.no-touch {
+        &:hover {
+          color: #667eea;
+        }
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+        
+        &:hover {
+          color: #667eea;
+        }
+      }
+    }
+
+    .address {
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #64748b;
+      margin: 0;
+      
+      @include res.sm {
+        font-size: 0.85rem;
+      }
+      
+      @include res.xs {
+        font-size: 0.8rem;
+      }
+    }
+
+    .price {
+      font-size: 0.9rem;
+      margin: 0;
+      
+      @include res.sm {
+        font-size: 0.85rem;
+      }
+      
+      @include res.xs {
+        font-size: 0.8rem;
+      }
+
+      .custom-chip {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-block;
+        
+        @include res.sm {
+          padding: 4px 10px;
+          font-size: 0.85rem;
+        }
+        
+        @include res.xs {
+          padding: 3px 8px;
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+      
+      @include res.sm {
+        gap: 10px;
+      }
+      
+      @include res.xs {
+        gap: 8px;
+      }
+
+      .features {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        
+        @include res.sm {
+          gap: 6px;
+        }
+        
+        @include res.xs {
+          gap: 4px;
+        }
+
+        .feature {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          background: rgba(102, 126, 234, 0.1);
+          color: #667eea;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          
+          @include res.sm {
+            padding: 3px 6px;
+            font-size: 0.75rem;
+          }
+          
+          @include res.xs {
+            padding: 2px 4px;
+            font-size: 0.7rem;
+          }
+        }
+      }
+
+      .icons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        @include res.sm {
+          gap: 6px;
+        }
+        
+        @include res.xs {
+          gap: 4px;
+        }
+
+        .icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          background: rgba(102, 126, 234, 0.1);
+          color: #667eea;
+          border-radius: 50%;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          @include res.sm {
+            width: 28px;
+            height: 28px;
+          }
+          
+          @include res.xs {
+            width: 24px;
+            height: 24px;
+          }
+          
+          @include res.no-touch {
+            &:hover {
+              background: rgba(102, 126, 234, 0.2);
+              transform: scale(1.1);
+            }
+          }
+          
+          @include res.touch {
+            &:active {
+              transform: scale(0.95);
+            }
+          }
+        }
+
+        .save-icon {
+          @include res.no-touch {
+            &:hover {
+              color: #ef4444;
+              background: rgba(239, 68, 68, 0.1);
+            }
+          }
+        }
+
+        .remove-saved-icon {
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+          
+          @include res.no-touch {
+            &:hover {
+              background: rgba(239, 68, 68, 0.2);
+            }
+          }
+        }
+      }
+    }
   }
 }
 
-/* Delete Confirmation Modal Customization */
-.modal-overlay {
-  z-index: 2000;
+// Responsive improvements
+@include res.xs {
+  .card {
+    .imgContainer {
+      height: 80px;
+    }
+    
+    .textContainer {
+      .title {
+        font-size: 0.85rem;
+      }
+      
+      .address {
+        font-size: 0.75rem;
+      }
+      
+      .price {
+        .custom-chip {
+          font-size: 0.75rem;
+          padding: 2px 6px;
+        }
+      }
+      
+      .bottom {
+        .features {
+          .feature {
+            font-size: 0.65rem;
+            padding: 1px 3px;
+          }
+        }
+        
+        .icons {
+          .icon {
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+    }
+  }
 }
-.modal-content {
-  max-width: 340px;
-  min-width: 260px;
-  padding: 20px 24px 18px 24px;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  font-size: 15px;
+
+// Landscape orientation adjustments
+@include res.landscape {
+  .card {
+    &.grid {
+      .imgContainer {
+        height: 120px;
+      }
+    }
+  }
 }
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f0f0f0;
+
+// High DPI display optimizations
+@include res.retina {
+  .card {
+    .imgContainer {
+      img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+      }
+    }
+  }
 }
-.modal-header h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-}
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 22px;
-  cursor: pointer;
-  color: #666;
-  padding: 2px 8px;
-  border-radius: 50%;
-  transition: background 0.2s;
-}
-.close-btn:hover {
-  background: #f0f0f0;
-}
-.modal-body {
-  padding: 18px 0 0 0;
-}
-.modal-body p {
-  margin-bottom: 18px;
-  color: #222;
-  font-size: 15px;
-  text-align: center;
-}
-.modal-body .modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-.cancelButton, .saveButton {
-  font-family: inherit;
-  font-size: 15px;
-  padding: 7px 18px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s, color 0.2s;
-}
-.cancelButton {
-  background: #f5f5f5;
-  color: #333;
-  border: 1px solid #e0e0e0;
-}
-.cancelButton:hover {
-  background: #e0e0e0;
-}
-.saveButton {
-  background: #e74c3c;
-  color: #fff;
-  border: 1px solid #e74c3c;
-}
-.saveButton:hover {
-  background: #c0392b;
-  border-color: #c0392b;
+
+// Touch device optimizations
+@include res.touch {
+  .card {
+    .textContainer {
+      .bottom {
+        .icons {
+          .icon {
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+          }
+        }
+      }
+    }
+  }
 }

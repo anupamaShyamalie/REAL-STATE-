@@ -1,132 +1,586 @@
-.listPage {
-    display: flex;
-    height: 100%; // match with your layout height minus header or whatever is on top
-  
-    .listContainer {
-      flex: 3;
-      height: 100%; // inherits 100% from listPage
-  
-  
-      .wrapper {
-        flex: 1;
-        overflow-y: hidden;
-        padding-right: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        height: 100%;
-        padding-bottom: 0;
-       
-        .filter-fixed {
-          position: sticky;
-          top: 0;
-          z-index: 2;
-          background: #fff;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-          padding-bottom: 8px;
-        }
+@use "../../responsive.scss" as res;
 
-        .post-list-scroll {
-          flex: 1;
-          overflow-y: auto;
-          overflow-x: hidden;
-          padding-top: 8px;
-          display: flex;
-          flex-direction: column;
-          gap: 50px;
-          height: 100%;
-          /* Custom scrollbar */
-          scrollbar-width: thin;
-          scrollbar-color: #123458 #e3f0ff;
-        }
-        .post-list-scroll::-webkit-scrollbar {
-          width: 10px;
-          background: #e3f0ff;
-          border-radius: 8px;
-        }
-        .post-list-scroll::-webkit-scrollbar-thumb {
-          background: #123458;
-          border-radius: 8px;
-          min-height: 40px;
-          box-shadow: 0 2px 8px rgba(18, 52, 88, 0.15);
-        }
-        .post-list-scroll::-webkit-scrollbar-thumb:hover {
-          background: #0d223a;
-        }
-        .post-list-scroll::-webkit-scrollbar-corner {
-          background: #e3f0ff;
-        }
-      }
-    }
+.listPage {
+  min-height: 100vh;
+  background: #f8fafc;
   
-    .mapContainer {
-      flex: 2;
-      background-color: #F5F7FB;
-      height: 100%;
+  .listPage-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0;
+    
+    @include res.sm {
+      padding: 0 16px;
+    }
+    
+    @include res.xs {
+      padding: 0 12px;
     }
   }
 
-.loading-skeletons {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  min-height: 60vh;
+  // Header Section
+  .listPage-header {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 24px 0;
+    position: sticky;
+    top: 80px; // Account for fixed navbar
+    z-index: 10;
+    
+    @include res.sm {
+      top: 70px;
+      padding: 20px 0;
+    }
+    
+    @include res.xs {
+      top: 65px;
+      padding: 16px 0;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      
+      @include res.md {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      
+      @include res.sm {
+        gap: 12px;
+      }
+
+      .search-summary {
+        flex: 1;
+        
+        h1 {
+          font-size: 1.75rem;
+          font-weight: 700;
+          color: #1a202c;
+          margin: 0 0 8px 0;
+          
+          @include res.sm {
+            font-size: 1.5rem;
+          }
+          
+          @include res.xs {
+            font-size: 1.25rem;
+          }
+        }
+
+        .search-description {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #64748b;
+          font-size: 0.95rem;
+          margin: 0;
+          
+          @include res.sm {
+            font-size: 0.9rem;
+          }
+          
+          @include res.xs {
+            font-size: 0.85rem;
+          }
+
+          .results-count {
+            color: #667eea;
+            font-weight: 500;
+          }
+        }
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        
+        @include res.sm {
+          gap: 8px;
+        }
+
+        button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 44px;
+          height: 44px;
+          background: rgba(102, 126, 234, 0.1);
+          border: none;
+          border-radius: 8px;
+          color: #667eea;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          @include res.sm {
+            width: 40px;
+            height: 40px;
+          }
+          
+          @include res.xs {
+            width: 36px;
+            height: 36px;
+          }
+          
+          @include res.no-touch {
+            &:hover {
+              background: rgba(102, 126, 234, 0.2);
+              transform: translateY(-1px);
+            }
+          }
+          
+          @include res.touch {
+            &:active {
+              transform: scale(0.95);
+            }
+          }
+
+          &.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+          }
+        }
+      }
+    }
+  }
+
+  // Main Content
+  .listPage-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 0;
+    min-height: calc(100vh - 200px);
+    
+    @include res.lg {
+      grid-template-columns: 1fr 2fr;
+    }
+    
+    @include res.md {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    @include res.sm {
+      gap: 16px;
+    }
+
+    // Filters Section
+    .filters-section {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      height: fit-content;
+      position: sticky;
+      top: 140px;
+      
+      @include res.lg {
+        display: none;
+        
+        &.active {
+          display: block;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 1000;
+          max-width: 90vw;
+          max-height: 80vh;
+          overflow-y: auto;
+        }
+      }
+      
+      @include res.sm {
+        padding: 20px;
+      }
+      
+      @include res.xs {
+        padding: 16px;
+      }
+    }
+
+    // Results Section
+    .results-section {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      
+      @include res.sm {
+        padding: 20px;
+      }
+      
+      @include res.xs {
+        padding: 16px;
+      }
+
+      &.with-map {
+        @include res.lg {
+          grid-column: span 2;
+        }
+      }
+
+      &.full-width {
+        grid-column: span 3;
+        
+        @include res.lg {
+          grid-column: span 2;
+        }
+        
+        @include res.md {
+          grid-column: span 1;
+        }
+      }
+
+      .posts-container {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        
+        @include res.sm {
+          gap: 20px;
+        }
+        
+        @include res.xs {
+          gap: 16px;
+        }
+
+        &.grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 24px;
+          
+          @include res.md {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+          }
+          
+          @include res.sm {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+        }
+      }
+
+      .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        
+        @include res.sm {
+          padding: 40px 16px;
+        }
+        
+        @include res.xs {
+          padding: 30px 12px;
+        }
+
+        .no-results-icon {
+          color: #cbd5e0;
+          margin-bottom: 24px;
+          
+          @include res.sm {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 20px;
+          }
+        }
+
+        h2 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #1a202c;
+          margin: 0 0 12px 0;
+          
+          @include res.sm {
+            font-size: 1.25rem;
+          }
+        }
+
+        p {
+          color: #64748b;
+          margin: 0 0 24px 0;
+          
+          @include res.sm {
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+          }
+        }
+
+        .browse-all-btn {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          @include res.no-touch {
+            &:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            }
+          }
+          
+          @include res.touch {
+            &:active {
+              transform: scale(0.98);
+            }
+          }
+        }
+      }
+    }
+
+    // Map Section
+    .map-section {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      
+      @include res.lg {
+        grid-column: span 2;
+      }
+      
+      @include res.md {
+        grid-column: span 1;
+        height: 400px;
+      }
+    }
+  }
+
+  // Loading Container
+  .loading-container {
+    padding: 40px 0;
+    
+    @include res.sm {
+      padding: 30px 0;
+    }
+    
+    @include res.xs {
+      padding: 20px 0;
+    }
+
+    .loading-content {
+      text-align: center;
+      margin-bottom: 40px;
+      
+      @include res.sm {
+        margin-bottom: 30px;
+      }
+
+      .loading-spinner {
+        color: #667eea;
+        animation: spin 1s linear infinite;
+        margin-bottom: 16px;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a202c;
+        margin: 0 0 8px 0;
+        
+        @include res.sm {
+          font-size: 1.1rem;
+        }
+      }
+
+      p {
+        color: #64748b;
+        margin: 0;
+        
+        @include res.sm {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .loading-skeletons {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      
+      @include res.sm {
+        gap: 20px;
+      }
+      
+      @include res.xs {
+        gap: 16px;
+      }
+    }
+  }
+
+  // Error Container
+  .error-container {
+    text-align: center;
+    padding: 60px 20px;
+    
+    @include res.sm {
+      padding: 40px 16px;
+    }
+    
+    @include res.xs {
+      padding: 30px 12px;
+    }
+
+    .error-icon {
+      color: #ef4444;
+      margin-bottom: 24px;
+      
+      @include res.sm {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 20px;
+      }
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1a202c;
+      margin: 0 0 12px 0;
+      
+      @include res.sm {
+        font-size: 1.25rem;
+      }
+    }
+
+    p {
+      color: #64748b;
+      margin: 0 0 24px 0;
+      
+      @include res.sm {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+      }
+    }
+
+    .retry-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      @include res.no-touch {
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+      }
+      
+      @include res.touch {
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+    }
+  }
 }
 
+// Skeleton Loading Styles
 .card.skeleton {
   pointer-events: none;
   opacity: 1;
-}
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  
+  @include res.sm {
+    padding: 16px;
+  }
+  
+  @include res.xs {
+    padding: 12px;
+  }
 
-.img-skeleton {
-  width: 100%;
-  height: 150px;
-  border-radius: 10px;
-  background: #e0e0e0;
-  margin-bottom: 0;
-}
+  .img-skeleton {
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    margin-bottom: 16px;
+    
+    @include res.sm {
+      height: 150px;
+    }
+    
+    @include res.xs {
+      height: 120px;
+    }
+  }
 
-.title-skeleton {
-  width: 60%;
-  height: 18px;
-  border-radius: 4px;
-  background: #e0e0e0;
-  margin: 10px 0 8px 0;
-}
+  .title-skeleton {
+    width: 70%;
+    height: 20px;
+    border-radius: 4px;
+    background: #e2e8f0;
+    margin: 0 0 12px 0;
+    
+    @include res.sm {
+      height: 18px;
+    }
+  }
 
-.address-skeleton {
-  width: 40%;
-  height: 14px;
-  border-radius: 4px;
-  background: #e0e0e0;
-  margin-bottom: 8px;
-}
+  .address-skeleton {
+    width: 50%;
+    height: 16px;
+    border-radius: 4px;
+    background: #e2e8f0;
+    margin: 0 0 12px 0;
+    
+    @include res.sm {
+      height: 14px;
+    }
+  }
 
-.price-skeleton {
-  width: 30%;
-  height: 14px;
-  border-radius: 8px;
-  background: #e0e0e0;
-  margin-bottom: 12px;
-}
+  .price-skeleton {
+    width: 40%;
+    height: 18px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    margin: 0 0 16px 0;
+    
+    @include res.sm {
+      height: 16px;
+    }
+  }
 
-.feature-skeleton {
-  width: 60px;
-  height: 18px;
-  border-radius: 10px;
-  background: #cfd8dc;
-  margin-right: 8px;
-}
+  .feature-skeleton {
+    width: 80px;
+    height: 20px;
+    border-radius: 10px;
+    background: #e2e8f0;
+    margin-right: 8px;
+    
+    @include res.sm {
+      width: 60px;
+      height: 18px;
+    }
+  }
 
-.icon-skeleton {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #ffcccc;
-  margin-right: 8px;
+  .icon-skeleton {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    margin-right: 8px;
+    
+    @include res.sm {
+      width: 20px;
+      height: 20px;
+    }
+  }
 }
 
 .shimmer {
@@ -137,8 +591,11 @@
 .shimmer::after {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   transform: translateX(-100%);
   animation: shimmer 1.2s infinite;
 }
@@ -149,24 +606,84 @@
   }
 }
 
-.progress-bar {
-  width: 60%;
-  height: 8px;
-  background: #f0f0f0;
-  border-radius: 4px;
-  margin: 32px auto 0 auto;
-  overflow: hidden;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.progress {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #ffcc00, #ff9900);
-  animation: progressBar 1.5s infinite linear;
+// Responsive improvements
+@include res.xs {
+  .listPage {
+    .listPage-container {
+      .listPage-header {
+        .header-content {
+          .search-summary {
+            h1 {
+              font-size: 1.1rem;
+            }
+            
+            .search-description {
+              font-size: 0.8rem;
+            }
+          }
+          
+          .header-actions {
+            button {
+              width: 32px;
+              height: 32px;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
-@keyframes progressBar {
-  0% { width: 0%; }
-  50% { width: 100%; }
-  100% { width: 0%; }
+// Landscape orientation adjustments
+@include res.landscape {
+  .listPage {
+    .listPage-content {
+      .results-section {
+        .posts-container {
+          gap: 16px;
+        }
+      }
+    }
+  }
+}
+
+// High DPI display optimizations
+@include res.retina {
+  .listPage {
+    .listPage-content {
+      .results-section {
+        .posts-container {
+          .card img {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Touch device optimizations
+@include res.touch {
+  .listPage {
+    .listPage-header {
+      .header-content {
+        .header-actions {
+          button {
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+          }
+        }
+      }
+    }
+  }
 }

@@ -7,7 +7,7 @@ import { AuthContext } from '../../context/AuthContext'
 import apiRequest from '../../lib/apiRequest'
 import { useNavigate } from 'react-router-dom'
 
-const Card = ({ item, isSavedList, onRemoveSaved, onDelete, onDeleteNotification }) => {
+const Card = ({ item, isSavedList, onRemoveSaved, onDelete, onDeleteNotification, viewMode = 'list' }) => {
   // Handle multiple possible image formats
   const getImageUrl = (item) => {
     // Check if item has images array
@@ -89,7 +89,7 @@ const Card = ({ item, isSavedList, onRemoveSaved, onDelete, onDeleteNotification
   }
   
   return (
-    <div className='card'>
+    <div className={`card ${viewMode}`}>
       <Link to={`/${item.id}`} className='imgContainer'>
         <img 
           src={imageUrl} 
@@ -197,6 +197,7 @@ Card.propTypes = {
   onRemoveSaved: PropTypes.func,
   onDelete: PropTypes.func,
   onDeleteNotification: PropTypes.func,
+  viewMode: PropTypes.oneOf(['list', 'grid']),
 }
 
 export default Card
